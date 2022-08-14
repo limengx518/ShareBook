@@ -2,11 +2,15 @@
 #define SCANANDCHECKJOTTINGController_H
 
 #include "controller.h"
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json ;
 
 class ScanAndCheckJottingController : public Controller
 {
 public:
     static ScanAndCheckJottingController *getInstance();
+    json pushJottings();
 private:
     ScanAndCheckJottingController();
     static ScanAndCheckJottingController* m_instance;
