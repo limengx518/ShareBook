@@ -13,14 +13,14 @@
 class Network {
 public:
     Network();
-    int Create();
-    int Connect(char *ipaddr);
+    int createSocket();
+    int connectSocket(char *ipaddr);
 
     nlohmann::json receiveMessage();
     bool sendMessage(char *buf, size_t size);
 
     void Writen(int fd, void *ptr, size_t nbytes);
-    int Close();
+    int closeSocket();
 
 private:
     int m_socketFd;

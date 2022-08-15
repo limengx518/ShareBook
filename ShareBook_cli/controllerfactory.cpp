@@ -11,9 +11,6 @@
  *****************************************************************************/
 #include "controllerfactory.h"
 
-#include "controllerfactory.h"
-
-
 ControllerFactory* ControllerFactory::m_instance=nullptr;
 
 

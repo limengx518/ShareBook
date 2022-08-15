@@ -11,6 +11,10 @@
  *****************************************************************************/
 #include "server.h"
 #include "string.h"
+#include <stdio.h>
+
+
+#define MAXLINE 1000
 
 Server::Server()
 {
@@ -20,40 +24,37 @@ Server::Server()
 void Server::start()
 {
     //创建套接字
-    m_network.Create();
-    m_network.Bind();
-    m_network.Listen();
-    int nready;
+    NetWork network;
+    network.closeSocket();
+    network.createSocket();
+    network.bindSocket();
+    network.listenSocket();
+    network.acceptSocket();
     while(1){
-        if(m_network.Poll()){
-            int connfd = m_network.Accept();
+        if(network.Poll()){
+            int connfd = network.acceptSocket();
             if(connfd<0) continue;
-            m_threadPool.submit(std::bind(&Server::processClientRequest, this, connfd));
+            json j = network.receiveMessage(connfd);
+            if(j.empty())  continue;
+            m_threadPool.submit(std::bind(&Server::processClientRequest, this, connfd,j));
+            processClientRequest(connfd,j);
+            close(connfd);
         };
     }
-
-    m_network.Accept();
 }
 
-void Server::processClientRequest(int fd)
+void Server::processClientRequest(int fd,json j)
 {
-    nlohmann::json j = m_network.receiveMessage(fd);
-    if(j.empty()){
-        return ;
-    }
-//    ScanAndCheckJottingController *controller = ControllerFactory::getInstance()->createScanAndCheckJottingController();
-//    json js = controller->pushJottings();
-//    std::string s = js.dump();
-//    std::cout<<s<<"  "<<s.length()<<"  "<<std::endl;
-//    m_network.sendMessage(s.data(),s.length()*sizeof(char),fd);
-
+    NetWork network;
     std::string request = j["request"];
-    //Controller *controller;
     if(request == "ScanJottings"){
         ScanAndCheckJottingController *controller = ControllerFactory::getInstance()->createScanAndCheckJottingController();
         json j = controller->pushJottings();
         std::string s = j.dump();
-        m_network.sendMessage(s.data(),s.length()*sizeof(char),fd);
+        network.sendMessage(s.data(),s.length()*sizeof(char),fd);
+        close(fd);
+
+
     }else if(request == "publishJotting"){
         PublishJottingController *controller = ControllerFactory::getInstance()->createPublishJottingController();
     }

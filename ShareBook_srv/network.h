@@ -26,11 +26,12 @@ class NetWork
 {
 public:
     NetWork();
-    int Create();
-    int Bind();
-    int Listen();
-    int Accept();
+    int createSocket();
+    int bindSocket();
+    int listenSocket();
+    int acceptSocket();
     int Poll();
+    void closeSocket();
     nlohmann::json receiveMessage(int connfd);
     bool sendMessage(char *buf,size_t size,int connfd);
 

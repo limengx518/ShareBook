@@ -18,26 +18,6 @@
 
 using json=nlohmann::json;
 
-void se(){
-    std::string ipaddr("192.168.155.100");
-    json j={
-        { "request", "ScanJottings"}
-    };
-    std::string message=j.dump();
-    Client client;
-    client.send(message.data(),sizeof(message),ipaddr.data());
-}
-
-void re(){
-    std::string ipaddr("192.168.155.100");
-    json j={
-        { "request", "ScanJottings"}
-    };
-    std::string message=j.dump();
-    Client client;
-    std::cout<<client.receive(ipaddr.data()).dump()<<std::endl;
-}
-
 int main(int argc, char *argv[])
 {
 //    QCoreApplication a(argc, argv);
@@ -53,13 +33,7 @@ int main(int argc, char *argv[])
 //    }
 
 //    return a.exec();
-
-//    std::thread s(se);
-//    std::thread r(re);
-
-//    s.join();
-//    r.join();
-    std::string ipaddr("10.252.71.12");
+    std::string ipaddr("192.168.230.100");
     json j={
         { "request", "ScanJottings"}
     };
@@ -67,5 +41,4 @@ int main(int argc, char *argv[])
     Client client;
     client.send(message.data(),sizeof(message),ipaddr.data());
     std::cout<<client.receive(ipaddr.data()).dump()<<std::endl;
-
 }

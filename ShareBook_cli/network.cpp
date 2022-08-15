@@ -24,7 +24,7 @@ Network::Network()
 }
 
 
-int Network::Create()
+int Network::createSocket()
 {
     m_socketFd = socket(AF_INET,SOCK_STREAM,0);
     if(m_socketFd==INVALID_SOCKET_FD){
@@ -33,7 +33,7 @@ int Network::Create()
     return m_socketFd;
 }
 
-int Network::Connect(char* ipaddr)
+int Network::connectSocket(char* ipaddr)
 {
     struct sockaddr_in servaddr;
     bzero(&servaddr,sizeof(servaddr));
@@ -42,7 +42,7 @@ int Network::Connect(char* ipaddr)
     inet_pton(AF_INET,ipaddr,&servaddr.sin_addr);
 
     if(connect(m_socketFd,(struct sockaddr *)&servaddr,sizeof(servaddr))<0){
-        std::cerr<<"Connect socket error"<<std::endl;
+        printf("Create socket failed. Errorn info: %d %s\n",errno,strerror(errno));
         return -1;
     }
     return 0;
@@ -51,27 +51,31 @@ int Network::Connect(char* ipaddr)
 nlohmann::json Network::receiveMessage()
 {
     char buf[MAXLINE];
-    int n;
-    fd_set rset;
-    FD_SET(m_socketFd,&rset);
-    select(m_socketFd+1,&rset,NULL,NULL,NULL);
-    if(FD_ISSET(m_socketFd,&rset)){
-        if((n=read(m_socketFd,buf,MAXLINE))<0){
-            if(errno == ECONNRESET){
-                //connection reset by client
-                Close();
-            }else std::cerr<<"Read error"<<std::endl;
-
-            return NULL;
-        }else if(n==0){
-            std::cout<<"server message is null"<<std::endl;
-            //connection closed by client
-            Close();
-            return NULL;
+//    int n=read(m_socketFd,buf,MAXLINE);
+    int n=recv(m_socketFd,buf,sizeof(buf),0);
+    std::cout<<"receieve Message: "<<std::endl;
+    if(n<0){
+        if(errno == ECONNRESET){//connection reset by client
+            printf("Connection reset by client！！\n");
+        }else if(errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
+            printf("Read time out!!\n");
+        }else{
+            printf("NetWork::receiveMessage-> Read failed. Errorn info: %d %s\n",errno,strerror(errno));
         }
-        json j = json::parse(buf);
+        return nullptr;
+    }else if(n==0){
+        printf("Client does not have input information ,and server does not have any information，waiting...\n");
+        //connection closed by client
+        return nullptr;
+    }
+    std::string s(buf);
+    if(s.empty()){
+        std::cerr<<"Network: Client receieve null"<<std::endl;
+        json j;
         return j;
     }
+    json j= json::parse(s);
+    return j;
 }
 
 bool Network::sendMessage(char *buf, size_t size)
@@ -80,8 +84,9 @@ bool Network::sendMessage(char *buf, size_t size)
         std::cerr<<"Client Socket error"<<std::endl;
         return false;
     }
-    Writen(m_socketFd,buf,size);
-    Close();
+    ::send(m_socketFd,buf,size,0);
+//    Writen(m_socketFd,buf,size);
+
     return true;
 }
 
@@ -93,10 +98,10 @@ void Network::Writen(int fd, void *ptr, size_t nbytes)
 
 //连接半关闭函数，当前留在套接字发送缓冲区的数据将被发送到，后跟TCP的正常连接终止序列。
 //进程不能对当前套接字调用任何写函数。
-int Network::Close()
+int Network::closeSocket()
 {
     if(shutdown(m_socketFd,SHUT_WR)<0){
-        std::cerr<<"Close error"<<std::endl;
+        printf("CloseSocket failed. Errorn info: %d %s\n",errno,strerror(errno));
         return -1;
     }
     return 0;

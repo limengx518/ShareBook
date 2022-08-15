@@ -24,45 +24,45 @@ NetWork::NetWork()
 
 }
 
-int NetWork::Create()
+int NetWork::createSocket()
 {
     m_listenFd = socket(AF_INET,SOCK_STREAM,0);
     if(m_listenFd==INVALID_SOCKET_FD){
-        std::cerr<<"Create socket error"<<std::endl;
+         printf("Create socket failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
     return m_listenFd;
 }
 
-int NetWork::Bind()
+int NetWork::bindSocket()
 {
     struct sockaddr_in servaddr;
     bzero(&servaddr,sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(SERV_PORT);
-    if(bind(m_listenFd,(struct sockaddr *)&servaddr,sizeof(servaddr))<0){
-        std::cerr<<"Bind socket error"<<std::endl;
+    if(bind(m_listenFd,(struct sockaddr *)&servaddr,sizeof(servaddr)) == -1){
+        printf("Bind socket failed. Errorn info: %d %s\n",errno,strerror(errno));
         return -1;
     }
     return 0;
 }
 
-int NetWork::Listen()
+int NetWork::listenSocket()
 {
     if(listen(m_listenFd,LISTENQ)<0){
-        std::cerr<<"Listen socket error"<<std::endl;
+        std::cerr<<"Listen socket error.Errorn info "<<errno<<","<<strerror(errno)<<std::endl;
         return -1;
     }
     return 0;
 }
 
-int NetWork::Accept()
+int NetWork::acceptSocket()
 {
     struct sockaddr_in cliaddr;
     socklen_t clilen = sizeof(cliaddr);
     int connfd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
     if(connfd<0){
-        std::cerr<<"Accept  error"<<std::endl;
+        printf("Accept socket failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
     return connfd;
 }
@@ -73,36 +73,48 @@ int NetWork::Poll()
     pd.fd  = m_listenFd;
     pd.events = POLLRDNORM;
     if(poll(&pd,1,INFTIM)<=0){
-        std::cerr<<"Poll error"<<std::endl;
+        printf("Poll failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
     return 1;
 
 }
 
+void NetWork::closeSocket()
+{
+    close(m_listenFd);
+}
+
 nlohmann::json NetWork::receiveMessage(int connfd)
 {
     char buf[MAXLINE];
-    int n;
-    if((n=read(connfd,buf,MAXLINE))<0){
-        if(errno == ECONNRESET){
-            //connection reset by client
-            close(connfd);
-        }else std::cerr<<"Read error"<<std::endl;
-
-    }else if(n==0){
-        //connection closed by client
+    memset(buf,0,sizeof(buf));
+//    int n=read(connfd,buf,sizeof(buf));
+    int n=recv(connfd,buf,sizeof(buf),0);
+    if(n == -1){
+        if(errno == ECONNRESET){//connection reset by client
+            printf("Connection reset by client！！\n");
+        }else if(errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
+            printf("Read time out!!\n");
+        }else{
+            printf("NetWork::receiveMessage-> Read failed. Errorn info: %d %s\n",errno,strerror(errno));
+        }
         close(connfd);
+        return nullptr;
+    }else if(n==0){
+        printf("The opposite end has closed the socket\n");
+        close(connfd);
+        return nullptr;
     }
-    close(connfd);
 
     std::string s(buf);
-    std::cout<<s<<std::endl;
     if(s.empty()){
-        std::cerr<<"Network: Receieve null"<<std::endl;
+        std::cerr<<"Network: Server receieve null"<<std::endl;
         json j;
+        close(connfd);
         return j;
     }
     json j= json::parse(s);
+    close(connfd);
     return j;
 }
 
@@ -112,13 +124,22 @@ bool NetWork::sendMessage(char *buf,size_t size,int connfd)
         std::cerr<<"Client Socket error"<<std::endl;
         return false;
     }
-    Writen(connfd,buf,size);
+    int n = ::send(connfd,buf,size,0);
+    if (n<0)
+        std::cerr<<"Writen error"<<std::endl;
+
+//    Writen(connfd,buf,size);
     close(connfd);
     return true;
 }
 
+void NetWork::Writen(int fd, void *ptr, size_t nbytes)
+{
+    if (writen(fd, ptr, nbytes) != nbytes)
+        std::cerr<<"Writen error"<<std::endl;
+}
 
-ssize_t	NetWork::writen(int fd, const void *vptr, size_t n)/* Write "n" bytes to a descriptor. */
+ssize_t NetWork::writen(int fd, const void *vptr, size_t n)
 {
     size_t		nleft;
     ssize_t		nwritten;
@@ -139,15 +160,4 @@ ssize_t	NetWork::writen(int fd, const void *vptr, size_t n)/* Write "n" bytes to
     }
     return(n);
 }
-/* end writen */
-
-void NetWork::Writen(int fd, void *ptr, size_t nbytes){
-    if (writen(fd, ptr, nbytes) != nbytes){
-         std::cerr<<"writen error"<<std::endl;
-    }else{
-        std::cerr<<"writen success"<<std::endl;
-    }
-}
-
-
 

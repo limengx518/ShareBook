@@ -11,6 +11,8 @@ public:
     Client();
     void send(char *buf, size_t size, char *ipaddr);
     nlohmann::json receive(char *ipaddr);
+    ~Client();
+private:
 };
 
 #endif // CLIENT_H

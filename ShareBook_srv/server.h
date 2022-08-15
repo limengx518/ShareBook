@@ -6,17 +6,16 @@
 #include "controllerfactory.h"
 #include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
+
 class Server
 {
 public:
     Server();
     void start();
-    void processClientRequest(int fd);
-
+    void processClientRequest(int fd,json j);
 private:
     ThreadPool m_threadPool;
-    NetWork m_network;
-
 };
 
 #endif // SERVER_H
