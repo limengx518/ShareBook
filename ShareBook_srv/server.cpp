@@ -18,44 +18,52 @@
 
 Server::Server()
 {
-
 }
 
 void Server::start()
 {
     //创建套接字
     NetWork network;
-    network.closeSocket();
     network.createSocket();
     network.bindSocket();
     network.listenSocket();
-    network.acceptSocket();
+    int nready;
     while(1){
         if(network.Poll()){
             int connfd = network.acceptSocket();
             if(connfd<0) continue;
-            json j = network.receiveMessage(connfd);
-            if(j.empty())  continue;
-            m_threadPool.submit(std::bind(&Server::processClientRequest, this, connfd,j));
-            processClientRequest(connfd,j);
-            close(connfd);
+            m_threadPool.submit(std::bind(&Server::processClientRequest,this, connfd));
         };
     }
+
+    network.closeSocket();
 }
 
-void Server::processClientRequest(int fd,json j)
+void Server::processClientRequest(int& fd)
 {
-    NetWork network;
-    std::string request = j["request"];
-    if(request == "ScanJottings"){
-        ScanAndCheckJottingController *controller = ControllerFactory::getInstance()->createScanAndCheckJottingController();
-        json j = controller->pushJottings();
-        std::string s = j.dump();
-        network.sendMessage(s.data(),s.length()*sizeof(char),fd);
-        close(fd);
+    try {
+        NetWork network;
+        json j = network.receiveMessage(fd);
 
-
-    }else if(request == "publishJotting"){
-        PublishJottingController *controller = ControllerFactory::getInstance()->createPublishJottingController();
+        if(j.empty()){
+            std::cout<<"receieve nullptr"<<std::endl;
+            return;
+        }
+//        std::cout<<j.dump()<<std::endl;
+        std::string request = j["request"];
+        if(request == "ScanJottings"){
+            ScanAndCheckJottingController *controller = ControllerFactory::getInstance()->createScanAndCheckJottingController();
+            json j = controller->pushJottings();
+            std::string s = j.dump();
+            network.sendMessage(s.data(),s.length()*sizeof(char),fd);
+            close(fd);
+        }else if(request == "PublishJottings"){
+            PublishJottingController *controller = ControllerFactory::getInstance()->createPublishJottingController();
+            std::string  isPub=controller->publishJottings(j);
+            network.sendMessage(isPub.data(),isPub.length()*sizeof(char),fd);
+            close(fd);
+        }
+    }  catch (...) {
+        std::cout<<"client error"<<std::endl;//确保当其中一个线程异常时不会影响另外的线程
     }
 }

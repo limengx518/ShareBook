@@ -13,7 +13,7 @@ class Server
 public:
     Server();
     void start();
-    void processClientRequest(int fd,json j);
+    void processClientRequest(int &fd);
 private:
     ThreadPool m_threadPool;
 };

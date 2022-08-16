@@ -32,15 +32,15 @@ public:
     int acceptSocket();
     int Poll();
     void closeSocket();
-    nlohmann::json receiveMessage(int connfd);
-    bool sendMessage(char *buf,size_t size,int connfd);
+    nlohmann::json receiveMessage(int &connfd);
+    bool sendMessage(char *buf, size_t size, int &connfd);
 
-    void Writen(int fd, void *ptr, size_t nbytes);
+    void Writen(int& fd, void *ptr, size_t nbytes);
 
 private:
     int m_listenFd;
 
-    ssize_t writen(int fd, const void *vptr, size_t n);
+    ssize_t writen(int& fd, const void *vptr, size_t n);
 
 
 };

@@ -2,17 +2,18 @@
 
 using json=nlohmann::json;
 
-Client::Client()
+Client::Client(char *ipaddr)
 {
+    m_network.createSocket();
+    m_network.connectSocket(ipaddr);
 }
-
 
 void Client::send(char *buf, size_t size, char *ipaddr)
 {
-    Network  m_network;
-    m_network.createSocket();
-    m_network.connectSocket(ipaddr);
+
     m_network.sendMessage(buf,size);
+    json j=m_network.receiveMessage();
+//    std::cout<<j.dump()<<std::endl;
     m_network.closeSocket();
 }
 

@@ -84,13 +84,12 @@ void NetWork::closeSocket()
     close(m_listenFd);
 }
 
-nlohmann::json NetWork::receiveMessage(int connfd)
+nlohmann::json NetWork::receiveMessage(int& connfd)
 {
     char buf[MAXLINE];
     memset(buf,0,sizeof(buf));
-//    int n=read(connfd,buf,sizeof(buf));
-    int n=recv(connfd,buf,sizeof(buf),0);
-    if(n == -1){
+    int n;
+    if((n=read(connfd,buf,sizeof(buf))) == -1){
         if(errno == ECONNRESET){//connection reset by client
             printf("Connection reset by client！！\n");
         }else if(errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
@@ -98,48 +97,29 @@ nlohmann::json NetWork::receiveMessage(int connfd)
         }else{
             printf("NetWork::receiveMessage-> Read failed. Errorn info: %d %s\n",errno,strerror(errno));
         }
-        close(connfd);
         return nullptr;
     }else if(n==0){
         printf("The opposite end has closed the socket\n");
-        close(connfd);
         return nullptr;
     }
-
     std::string s(buf);
-    if(s.empty()){
-        std::cerr<<"Network: Server receieve null"<<std::endl;
-        json j;
-        close(connfd);
-        return j;
-    }
-    json j= json::parse(s);
-    close(connfd);
+    std::cout<<"s="<<s<<std::endl;
+    json j= json::parse(buf);
     return j;
 }
 
-bool NetWork::sendMessage(char *buf,size_t size,int connfd)
+bool NetWork::sendMessage(char *buf,size_t size,int &connfd)
 {
     if(connfd<0){
         std::cerr<<"Client Socket error"<<std::endl;
         return false;
     }
-    int n = ::send(connfd,buf,size,0);
-    if (n<0)
-        std::cerr<<"Writen error"<<std::endl;
-
-//    Writen(connfd,buf,size);
-    close(connfd);
+    Writen(connfd,buf,size);
     return true;
 }
 
-void NetWork::Writen(int fd, void *ptr, size_t nbytes)
-{
-    if (writen(fd, ptr, nbytes) != nbytes)
-        std::cerr<<"Writen error"<<std::endl;
-}
 
-ssize_t NetWork::writen(int fd, const void *vptr, size_t n)
+ssize_t	NetWork::writen(int& fd, const void *vptr, size_t n)/* Write "n" bytes to a descriptor. */
 {
     size_t		nleft;
     ssize_t		nwritten;
@@ -151,8 +131,10 @@ ssize_t NetWork::writen(int fd, const void *vptr, size_t n)
         if ( (nwritten = write(fd, ptr, nleft)) <= 0) {
             if (nwritten < 0 && errno == EINTR)
                 nwritten = 0;		/* and call write() again */
-            else
-                return(-1);			/* error */
+            else{
+                 printf("error == %d\n",errno);
+                 return(-1);			/* error */
+            }
         }
 
         nleft -= nwritten;
@@ -160,4 +142,15 @@ ssize_t NetWork::writen(int fd, const void *vptr, size_t n)
     }
     return(n);
 }
+/* end writen */
+
+void NetWork::Writen(int &fd, void *ptr, size_t nbytes){
+    if (writen(fd, ptr, nbytes) != nbytes){
+          printf("Writen failed. Errorn info: %d %s\n",errno,strerror(errno));
+    }else{
+        std::cerr<<"Writen success"<<std::endl;
+    }
+}
+
+
 

@@ -13,7 +13,7 @@
 
 #define SERV_PORT 9877
 #define INFTIM -1 //poll永远等待
-#define MAXLINE 1000000
+#define MAXLINE 100000000
 #define INVALID_SOCKET_FD -1
 
 using json = nlohmann::json;
@@ -30,6 +30,7 @@ int Network::createSocket()
     if(m_socketFd==INVALID_SOCKET_FD){
         std::cerr<<"Create socket error"<<std::endl;
     }
+    std::cout<<m_socketFd<<std::endl;
     return m_socketFd;
 }
 

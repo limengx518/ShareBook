@@ -18,5 +18,4 @@ int main()
 {
     Server server;
     server.start();
-
 }

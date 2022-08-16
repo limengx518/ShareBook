@@ -23,7 +23,7 @@ ScanAndCheckJottingController *ScanAndCheckJottingController::getInstance()
 
 json ScanAndCheckJottingController::scanJottings(char *ipaddr)
 {
-    Client client;
+    Client client(ipaddr);
     return client.receive(ipaddr);
 }
 

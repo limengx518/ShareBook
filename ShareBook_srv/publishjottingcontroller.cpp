@@ -10,7 +10,7 @@
  * @history
  *****************************************************************************/
 #include "publishjottingcontroller.h"
-
+#include <iostream>
 
 PublishJottingController* PublishJottingController::m_instance = nullptr;
 
@@ -20,6 +20,12 @@ PublishJottingController* PublishJottingController::getInstance()
         m_instance=new PublishJottingController();
     }
     return m_instance;
+}
+
+std::string  PublishJottingController::publishJottings(nlohmann::json j)
+{
+    std::cout<<"发送笔记"<<std::endl;
+    return "true";
 }
 
 PublishJottingController::PublishJottingController()
