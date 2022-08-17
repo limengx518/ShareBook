@@ -24,7 +24,8 @@ PublishJottingController* PublishJottingController::getInstance()
 
 std::string  PublishJottingController::publishJottings(nlohmann::json j)
 {
-    std::cout<<"发送笔记"<<std::endl;
+    std::cout<<"发布笔记详情:"<<j.dump()<<std::endl;
+
     return "true";
 }
 

@@ -15,16 +15,14 @@ public:
     Network();
     int createSocket();
     int connectSocket(char *ipaddr);
+    int closeSocket();
 
     nlohmann::json receiveMessage();
     bool sendMessage(char *buf, size_t size);
-
-    void Writen(int fd, void *ptr, size_t nbytes);
-    int closeSocket();
-
+    bool sendFile(char *buf,size_t size,std::string filePath);
+    ~Network();
 private:
     int m_socketFd;
-    ssize_t writen(int fd, const void *vptr, size_t n);
 
 };
 

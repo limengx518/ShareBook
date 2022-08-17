@@ -19,12 +19,18 @@
 using json = nlohmann::json;
 
 
-NetWork::NetWork()
+Network::Network()
 {
 
 }
 
-int NetWork::createSocket()
+Network::Network(int &fd)
+    :m_listenFd(fd)
+{
+
+}
+
+int Network::createSocket()
 {
     m_listenFd = socket(AF_INET,SOCK_STREAM,0);
     if(m_listenFd==INVALID_SOCKET_FD){
@@ -33,7 +39,7 @@ int NetWork::createSocket()
     return m_listenFd;
 }
 
-int NetWork::bindSocket()
+int Network::bindSocket()
 {
     struct sockaddr_in servaddr;
     bzero(&servaddr,sizeof(servaddr));
@@ -47,7 +53,7 @@ int NetWork::bindSocket()
     return 0;
 }
 
-int NetWork::listenSocket()
+int Network::listenSocket()
 {
     if(listen(m_listenFd,LISTENQ)<0){
         std::cerr<<"Listen socket error.Errorn info "<<errno<<","<<strerror(errno)<<std::endl;
@@ -56,7 +62,7 @@ int NetWork::listenSocket()
     return 0;
 }
 
-int NetWork::acceptSocket()
+int Network::acceptSocket()
 {
     struct sockaddr_in cliaddr;
     socklen_t clilen = sizeof(cliaddr);
@@ -67,7 +73,7 @@ int NetWork::acceptSocket()
     return connfd;
 }
 
-int NetWork::Poll()
+int Network::pollSocket()
 {
     struct pollfd pd;
     pd.fd  = m_listenFd;
@@ -79,78 +85,98 @@ int NetWork::Poll()
 
 }
 
-void NetWork::closeSocket()
+Network::~Network()
+{
+    closeSocket();
+}
+
+void Network::closeSocket()
 {
     close(m_listenFd);
 }
 
-nlohmann::json NetWork::receiveMessage(int& connfd)
+int Network::sendMessage(char *buf,size_t size,int &connfd)
+{
+    if(connfd<0){
+        printf("Client socket error.Errorn info: %d %s\n",errno,strerror(errno));
+        return false;
+    }
+    if(buf == NULL || size <= 0) return -1;
+    int n = ::send(connfd,buf,size,0);
+    if(n <0){
+        if(errno == EWOULDBLOCK || errno == EINTR || errno == EWOULDBLOCK){
+            printf("Server write error. Errorn info: %d %s\n",errno,strerror(errno));
+        }
+        return -1;
+    }
+    return n;
+}
+
+nlohmann::json Network::receiveMessage(int& connfd)
 {
     char buf[MAXLINE];
     memset(buf,0,sizeof(buf));
-    int n;
-    if((n=read(connfd,buf,sizeof(buf))) == -1){
-        if(errno == ECONNRESET){//connection reset by client
-            printf("Connection reset by client！！\n");
-        }else if(errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
-            printf("Read time out!!\n");
-        }else{
-            printf("NetWork::receiveMessage-> Read failed. Errorn info: %d %s\n",errno,strerror(errno));
+    int n=recv(connfd,buf,sizeof(buf),0);
+    if( n == -1){
+        if(errno == ECONNRESET || errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
+            printf("Server read error. Errorn info: %d %s\n",errno,strerror(errno));
         }
         return nullptr;
     }else if(n==0){
-        printf("The opposite end has closed the socket\n");
+        printf("The opposite end has closed the socket.\n");
         return nullptr;
     }
     std::string s(buf);
-    std::cout<<"s="<<s<<std::endl;
     json j= json::parse(buf);
     return j;
 }
 
-bool NetWork::sendMessage(char *buf,size_t size,int &connfd)
+int Network::sendFile(char *buf, size_t size,  int &connfd,std::string filePath)
 {
-    if(connfd<0){
-        std::cerr<<"Client Socket error"<<std::endl;
+    if(m_listenFd<0){
+        printf("Client socket error.Errorn info: %d %s\n",errno,strerror(errno));
         return false;
     }
-    Writen(connfd,buf,size);
-    return true;
-}
-
-
-ssize_t	NetWork::writen(int& fd, const void *vptr, size_t n)/* Write "n" bytes to a descriptor. */
-{
-    size_t		nleft;
-    ssize_t		nwritten;
-    const char	*ptr;
-
-    ptr = (char *)vptr;
-    nleft = n;
-    while (nleft > 0) {
-        if ( (nwritten = write(fd, ptr, nleft)) <= 0) {
-            if (nwritten < 0 && errno == EINTR)
-                nwritten = 0;		/* and call write() again */
-            else{
-                 printf("error == %d\n",errno);
-                 return(-1);			/* error */
-            }
+    FILE *fq;
+    if( ( fq = fopen(filePath.c_str(),"rb") ) == NULL ){
+        printf("File open.\n");
+        close(connfd);
+        exit(1);
+    }
+    int len;
+    while(!feof(fq)){
+        len = fread(buf, 1, sizeof(buf), fq);
+        if(len != ::send(connfd, buf, len,0)){
+            printf("Server file write error. Errorn info: %d %s\n",errno,strerror(errno));
+            break;
         }
-
-        nleft -= nwritten;
-        ptr   += nwritten;
     }
-    return(n);
-}
-/* end writen */
-
-void NetWork::Writen(int &fd, void *ptr, size_t nbytes){
-    if (writen(fd, ptr, nbytes) != nbytes){
-          printf("Writen failed. Errorn info: %d %s\n",errno,strerror(errno));
-    }else{
-        std::cerr<<"Writen success"<<std::endl;
-    }
+    fclose(fq);
+    return 1;
 }
 
+std::string Network::receiveFile(int &connfd,std::string filePath)
+{
+    FILE *fp;
+    if((fp = fopen(filePath.c_str(),"ab")) == NULL ){
+       printf("File.\n");
+       close(m_listenFd);
+       exit(1);
+    }
 
+    char buf[MAXLINE];
+    memset(buf,0,sizeof(buf));
+    int n;
+
+    while(1){
+        n = ::recv(connfd, buf, MAXLINE,0);
+        if(n<0) printf("Server file read error. Errorn info: %d %s\n",errno,strerror(errno));
+        if(n == 0) break;
+        fwrite(buf, 1, n, fp);
+    }
+    buf[n] = '\0';
+    fclose(fp);
+
+    return "接收文件成功！！";
+}
 

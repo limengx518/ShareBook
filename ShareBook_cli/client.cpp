@@ -8,24 +8,19 @@ Client::Client(char *ipaddr)
     m_network.connectSocket(ipaddr);
 }
 
-void Client::send(char *buf, size_t size, char *ipaddr)
+void Client::send(char *buf, size_t size)
 {
-
     m_network.sendMessage(buf,size);
-    json j=m_network.receiveMessage();
-//    std::cout<<j.dump()<<std::endl;
-    m_network.closeSocket();
 }
 
-
-nlohmann::json Client::receive(char *ipaddr)
+void Client::sendFile(char *buf,size_t size,std::string filePath)
 {
-    Network  m_network;
-    m_network.createSocket();
-    m_network.connectSocket(ipaddr);
-//    std::cout<<"Receive"<<std::endl;
+    m_network.sendFile(buf,size,filePath);
+}
+
+nlohmann::json Client::receive()
+{
     json j=m_network.receiveMessage();
-    m_network.closeSocket();
     return j;
 }
 

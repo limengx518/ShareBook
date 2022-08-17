@@ -22,27 +22,27 @@
 
 #define INVALID_SOCKET_FD -1
 
-class NetWork
+class Network
 {
 public:
-    NetWork();
+    Network();
+    Network(int &fd);
     int createSocket();
     int bindSocket();
     int listenSocket();
     int acceptSocket();
-    int Poll();
     void closeSocket();
+    int pollSocket();
+    ~Network();
+
+
+    int sendMessage(char *buf, size_t size, int &connfd);
     nlohmann::json receiveMessage(int &connfd);
-    bool sendMessage(char *buf, size_t size, int &connfd);
 
-    void Writen(int& fd, void *ptr, size_t nbytes);
-
+    int sendFile(char *buf,size_t size, int &connfd, std::string filePath);
+    std::string receiveFile(int &connfd, std::string filePath);
 private:
     int m_listenFd;
-
-    ssize_t writen(int& fd, const void *vptr, size_t n);
-
-
 };
 
 #endif // NETWORK_H

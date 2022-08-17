@@ -17,13 +17,15 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core LinguistTools)
 set(TS_FILES ShareBook_cli_en_001.ts)
 
 add_executable(ShareBook_cli
-  main.cpp
-  controller.cpp
-  controllerfactory.cpp
-  scanandcheckjottingcontroller.cpp
-  publishjottingcontroller.cpp
-  network.cpp
-  client.cpp
+    boostclient.cpp
+    boostnetwork.cpp
+    main.cpp
+    controller.cpp
+    controllerfactory.cpp
+    scanandcheckjottingcontroller.cpp
+    publishjottingcontroller.cpp
+    network.cpp
+    client.cpp
   ${TS_FILES}
 )
 target_link_libraries(ShareBook_cli Qt${QT_VERSION_MAJOR}::Core)

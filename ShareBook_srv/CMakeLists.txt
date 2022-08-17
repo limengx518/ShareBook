@@ -14,6 +14,8 @@ project( ShareBook_srv
 add_executable( ShareBook_srv )
 
 target_sources( ShareBook_srv PRIVATE 
+                boostnetwork.cpp
+                boostserver.cpp
                 controller.cpp
                 controllerfactory.cpp
                 scanandcheckjottingcontroller.cpp

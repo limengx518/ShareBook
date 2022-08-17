@@ -9,21 +9,22 @@
  * @date       2022/08/14
  * @history
  *****************************************************************************/
+
+#include "boostclient.h"
+#include "client.h"
+
 #include <QCoreApplication>
 #include <QLocale>
 #include <QTranslator>
-#include "client.h"
 #include <nlohmann/json.hpp>
 #include <thread>
 
-
-#include "base64.h"
+#define MAX 20
 
 using json=nlohmann::json;
-/*
-void publish(){
-    std::string ipaddr("192.168.149.197");
 
+//test
+void publish(){
     json jotting = {
         { "request", "PublishJottings"},
         { "name", "moomoo"},
@@ -34,25 +35,21 @@ void publish(){
     };
     std::string sendData=jotting.dump();
 
-
-    Client client("192.168.149.100");
-//    sleep(10);
-    client.send(sendData.data(),sendData.length(),ipaddr.data());
+    char ipaddr[MAX] ={"192.168.149.100"};
+    Client client(ipaddr);
+    client.send(sendData.data(),sendData.length());
 }
-
+//test
 void scan(){
-    std::string ipaddr("192.168.149.100");
-
     json jotting = {
         { "request", "ScanJottings"}
     };
     std::string sendData=jotting.dump();
 
-
-    Client client("192.168.149.100");
-//    sleep(10);
-    client.send(sendData.data(),sendData.length(),ipaddr.data());
-}*/
+    char ipaddr[MAX] ={"192.168.149.100"};
+    Client client(ipaddr);
+    client.send(sendData.data(),sendData.length());
+}
 
 int main(int argc, char *argv[])
 {
@@ -71,36 +68,31 @@ int main(int argc, char *argv[])
 //    return a.exec();
 
 
+    char ipaddr[MAX] ={"192.168.149.100"};
+    Client client(ipaddr);
 
-
-
-    std::string ipaddr("192.168.149.100");
-    Client client("192.168.149.100");
-
-    //读取图片文件
-    std::ifstream fin("/root/01.jpg", std::ios::binary);
-    fin.seekg(0, ios::end);
-    int iSize = fin.tellg();
-    char* szBuf = new (std::nothrow) char[iSize];
-    fin.seekg(0, ios::beg);
-    fin.read(szBuf, sizeof(char) * iSize);
-    fin.close();
-    //将图片解码
-    string imgEncode = base64_encode(szBuf,iSize);
-
-    json jotting = {
-        { "request", "PublishJottings"},
-        { "material","/root/01.jpg"}
+    json message = {
+        { "request", "ScanJottings"},
+        { "material","/root/01.mp4"}
     };
-//    std::cout<<jotting.dump()<<std::endl;
-    jotting["material"]=imgEncode;
-    string sendData = jotting.dump();
-//    std::cout<<imgEncode.size()<<std::endl;
 
-    client.send(sendData.data(),sendData.length(),ipaddr.data());
+    std::string sendData = message.dump();
+    client.send(sendData.data(),sendData.length());
+    json j = client.receive();
+    std::cout<<"Client recieve data:"<<j.dump()<<std::endl;
 
-//     std::thread t1(publish),t2(scan);
+
+//    std::string sendData = jotting["material"];
+//    client.sendFile(sendData.data(),sendData.length(),sendData);
+
+
+//    BoostClient client;
+//    client.send("192.168.149.100",message.dump());
+
+
+//    std::thread t1(publish),t2(scan);
 //     t1.join();
 //     t2.join();
 
+    return 0;
 }
