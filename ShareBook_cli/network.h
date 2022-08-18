@@ -17,8 +17,9 @@ public:
     int connectSocket(char *ipaddr);
     int closeSocket();
 
-    nlohmann::json receiveMessage();
+    std::string receiveMessage();
     bool sendMessage(char *buf, size_t size);
+    bool sendPic(const char *buf, size_t size);
     bool sendFile(char *buf,size_t size,std::string filePath);
     ~Network();
 private:

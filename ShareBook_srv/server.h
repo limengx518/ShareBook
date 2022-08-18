@@ -14,7 +14,8 @@ public:
     Server();
     void start();
 
-    nlohmann::json receiveMessage(int &connfd);
+    std::string receiveMessage(int &connfd);
+    bool receivePic(int &connfd, char *buf);
     void sendMessage(char *buf, size_t size, int &connfd);
     void sendFile(char *buf, size_t size, int &connfd,std::string filePath);
 

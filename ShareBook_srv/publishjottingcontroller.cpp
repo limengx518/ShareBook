@@ -26,7 +26,7 @@ std::string  PublishJottingController::publishJottings(nlohmann::json j)
 {
     std::cout<<"发布笔记详情:"<<j.dump()<<std::endl;
 
-    return "true";
+    return "请求发送material完整信息";
 }
 
 PublishJottingController::PublishJottingController()

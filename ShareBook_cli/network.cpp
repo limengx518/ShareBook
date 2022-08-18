@@ -13,7 +13,7 @@
 
 #define SERV_PORT 9877
 #define INFTIM -1 //poll永远等待
-#define MAXLINE 10000
+#define MAXLINE 1024
 #define INVALID_SOCKET_FD -1
 
 using json = nlohmann::json;
@@ -48,7 +48,7 @@ int Network::connectSocket(char* ipaddr)
     return 0;
 }
 
-nlohmann::json Network::receiveMessage()
+std::string Network::receiveMessage()
 {
     char buf[MAXLINE];
     memset(buf,0,sizeof(buf));
@@ -66,9 +66,8 @@ nlohmann::json Network::receiveMessage()
     if(s.empty()){
         std::cerr<<"Network: Client receieve null"<<std::endl;
         return nullptr;
-    }
-    json j= json::parse(s);
-    return j;
+    };
+    return s;
 }
 
 bool Network::sendMessage(char *buf, size_t size)
@@ -89,8 +88,44 @@ bool Network::sendMessage(char *buf, size_t size)
     return true;
 }
 
+#include <cstring>
+
+bool Network::sendPic(const char *buf, size_t size)
+{
+    if(m_socketFd<0){
+        std::cerr<<"Client Socket error"<<std::endl;
+        return false;
+    }
+    int send_size = 0,msg_size = strlen(buf);
+
+    std::cout<<"发送字节流:"<<msg_size<<std::endl;
+    std::string str = std::to_string(msg_size);
+    send_size = send(m_socketFd, str.c_str(), str.size(), 0);
+    std::cout<<"send_size =="<<send_size<<std::endl;
+    std::cout<<"msg_size =="<<msg_size<<std::endl;
+
+    int pos = 0;
+    std::string tmp(buf);
+//    while (msg_size > 0) {
+//       send_size = send(m_socketFd, buf+pos, 1024, 0);
+//       std::cout<<"while:: send_size =="<<send_size<<std::endl;
+
+//       if (send_size < 0) {
+//            printf("Client write error. Errorn info: %d %s\n",errno,strerror(errno));
+//            return false;
+//       }
+//       std::cout<<"\n"<<"pos=="<<pos<<std::endl;
+//       pos += send_size;
+//       msg_size -= send_size;;
+
+//    }
+    std::cout<<"success"<<std::endl;
+    return true;
+}
+
 bool Network::sendFile(char *buf, size_t size, std::string filePath)
 {
+
     if(m_socketFd<0){
         std::cerr<<"Client Socket error"<<std::endl;
         return false;

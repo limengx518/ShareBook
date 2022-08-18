@@ -15,6 +15,7 @@
 #include "boostserver.h"
 #include "server.h"
 
+
 void boostServer(){
     BoostServer boostServer;
     boostServer.start();
@@ -26,8 +27,9 @@ void cServer(){
 
 int main()
 {
-    std::thread threada(boostServer);
-    std::thread threadb(cServer);
-    threada.join();
-    threadb.join();
+//    std::thread threada(boostServer);
+//    std::thread threadb(cServer);
+//    threada.join();
+//    threadb.join();
+    cServer();
 }

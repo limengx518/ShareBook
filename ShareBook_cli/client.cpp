@@ -13,15 +13,19 @@ void Client::send(char *buf, size_t size)
     m_network.sendMessage(buf,size);
 }
 
+void Client::sendPic(char *buf, size_t size)
+{
+    m_network.sendPic(buf,size);
+}
+
 void Client::sendFile(char *buf,size_t size,std::string filePath)
 {
     m_network.sendFile(buf,size,filePath);
 }
 
-nlohmann::json Client::receive()
+std::string Client::receive()
 {
-    json j=m_network.receiveMessage();
-    return j;
+    return m_network.receiveMessage();
 }
 
 Client::~Client()

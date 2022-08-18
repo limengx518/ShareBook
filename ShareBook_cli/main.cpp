@@ -12,6 +12,7 @@
 
 #include "boostclient.h"
 #include "client.h"
+#include "base64.h"
 
 #include <QCoreApplication>
 #include <QLocale>
@@ -68,23 +69,49 @@ int main(int argc, char *argv[])
 //    return a.exec();
 
 
-    char ipaddr[MAX] ={"192.168.149.100"};
+    char ipaddr[MAX] ={"10.252.71.12"};
     Client client(ipaddr);
 
     json message = {
-        { "request", "ScanJottings"},
-        { "material","/root/01.mp4"}
+        { "request", "PublishJottings"},
+        { "material","/root/01.jpg"}
     };
 
-    std::string sendData = message.dump();
-    client.send(sendData.data(),sendData.length());
-    json j = client.receive();
-    std::cout<<"Client recieve data:"<<j.dump()<<std::endl;
+    //将图片解码为二进制流
+    std::string picPath = message["material"];
+    std::cout<<picPath<<std::endl;
+    std::ifstream fin(picPath, std::ios::binary);
+    fin.seekg(0, ios::end);
+    int iSize = fin.tellg();
+    char* szBuf = new (std::nothrow) char[iSize];
+    fin.seekg(0, ios::beg);
+    fin.read(szBuf, sizeof(char) * iSize);
+    fin.close();
 
+//    //图片解码后的二进制流
+    string imgStr=base64_encode(szBuf,iSize);
+//    client.sendPic(imgStr.data(),imgStr.size());
+
+/*
+    //发送端, 发送字节长度+结束标志位(end)
+    string flag = to_string(imgStr.size())+"END";
+    string flagData = base64_encode(flag.c_str(),flag.size());
+    message["material"] = flagData;*/
+
+    string sendData = message.dump();
+    std::cout<<message.dump()<<std::endl;
+    client.send(sendData.data(),sendData.size());
+
+    string receiveData = client.receive();
+    std::cout<<"Client recieve data:"<<receiveData<<std::endl;
+    if(receiveData == "请求发送material完整信息"){
+        std::cout<<"服务端收到标志数据，客户端发送图像字节流数据:"<<std::endl;
+        std::cout<<"即将发送的字节流大小是"<<imgStr.size()<<std::endl;
+        client.sendPic(imgStr.data(),imgStr.size());
+    }
 
 //    std::string sendData = jotting["material"];
 //    client.sendFile(sendData.data(),sendData.length(),sendData);
-
 
 //    BoostClient client;
 //    client.send("192.168.149.100",message.dump());

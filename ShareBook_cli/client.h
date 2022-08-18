@@ -10,8 +10,9 @@ class Client
 public:
     Client(char *ipaddr);
     void send(char *buf, size_t size);
+    void sendPic(char *buf, size_t size);
     void sendFile(char *buf, size_t size, std::string filePath);
-    nlohmann::json receive();
+    std::string receive();
     ~Client();
 private:
     Network  m_network;
