@@ -98,26 +98,35 @@ void Network::closeSocket()
 int Network::sendMessage(char *buf,size_t size,int &connfd)
 {
     if(connfd<0){
-        printf("Client socket error.Errorn info: %d %s\n",errno,strerror(errno));
+        std::cerr<<"Server Socket error"<<std::endl;
         return false;
     }
-    if(buf == NULL || size <= 0) return -1;
-    int n = ::send(connfd,buf,size,0);
-    if(n <0){
-        if(errno == EWOULDBLOCK || errno == EINTR || errno == EWOULDBLOCK){
+    int send_size = 0 , msg_size = strlen(buf);
+
+    send_size = send(connfd, &msg_size, sizeof(4), 0);
+
+    int pos = 0;
+    std::string tmp(buf);
+    while (msg_size > 0) {
+       send_size = send(connfd, buf+pos, 1024, 0);
+
+       if (send_size < 0) {
             printf("Server write error. Errorn info: %d %s\n",errno,strerror(errno));
-        }
-        return -1;
+            return false;
+       }
+       pos += send_size;
+       msg_size -= send_size;;
+
     }
-    return n;
+    return true;
 }
 
+/*
 std::string Network::receiveMessage(int& connfd)
 {
     char buf[MAXLINE];
     memset(buf,0,sizeof(buf));
     int n=recv(connfd,buf,sizeof(buf),0);
-    std::cout<<"buf=== "<<buf<<std::endl;
     if( n == -1){
         if(errno == ECONNRESET || errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
             printf("Server read error. Errorn info: %d %s\n",errno,strerror(errno));
@@ -129,11 +138,11 @@ std::string Network::receiveMessage(int& connfd)
     }
     std::string s(buf);
     return s;
-}
+}*/
 
-bool Network::receivePic(int &connfd,char* buffer)
+bool Network::receiveMessage(int &connfd,char* buffer)
 {
-    int one_size = 0,msg_size = 5396;
+    int one_size = 0,msg_size;
     std::string msg;
 
 //    //每次发送数据之前，先发送一个固定长度的自定义包头，包头中定义了这一次数据的长度。
@@ -141,27 +150,21 @@ bool Network::receivePic(int &connfd,char* buffer)
 //    //我们使用一个int类型作为“包头”，代表发送数据的长度。
 //    //而int类型固定4字节，因此服务端每次先接受4字节的数据x，再接受x字节的字符串数据。
 
-    one_size = read(connfd,buffer,sizeof(buffer));
-    std::cout<<"one_size == "<<one_size<<std::endl;
-    std::cout<<"buffer == "<<buffer<<std::endl;
-
-    std::cout<<"套接字<<"<<connfd<<std::endl;
-
-//    int pos = 0;
-//    while (msg_size > 0) {
-//        one_size = recv(connfd, buffer+pos , 1024, 0);
-//        std::cout<<"while:: one_size =="<<one_size<<"   buffer"<<buffer<<std::endl;
-//        if (one_size == 0) {
-//            printf("client disconnect\n");
-//            return false;
-//        }
-//        if (one_size < 0) {
-//            printf("Server read error. Errorn info: %d %s\n",errno,strerror(errno));
-//            return false;
-//        }
-//        pos += one_size;
-//        msg_size -= one_size;
-//    }
+    one_size = read(connfd,&msg_size,sizeof(4));
+    int pos = 0;
+    while (msg_size > 0) {
+        one_size = recv(connfd, buffer+pos , 1024, 0);
+        if (one_size == 0) {
+            printf("client disconnect\n");
+            return false;
+        }
+        if (one_size < 0) {
+            printf("Server read error. Errorn info: %d %s\n",errno,strerror(errno));
+            return false;
+        }
+        pos += one_size;
+        msg_size -= one_size;
+    }
     return true;
 }
 

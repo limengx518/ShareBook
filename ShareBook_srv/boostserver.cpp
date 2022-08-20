@@ -9,7 +9,8 @@ using json=nlohmann::json;
 
 BoostServer::BoostServer()
 {
-
+    m_scanAndCheckJottingController = ControllerFactory::getInstance()->createScanAndCheckJottingController();
+    m_publishJottingController = ControllerFactory::getInstance()->createPublishJottingController();
 }
 
 void BoostServer::start()
@@ -32,17 +33,17 @@ void BoostServer::processClientRequest(socket_ptr s)
     try {
         BoostNetwork boostNetwork(s);
         std::string message=boostNetwork.receiveMessage();
-        std::cout<<message<<std::endl;
         json j=json::parse(message);
         std::string request = j["request"];
         if(request == "ScanJottings"){
-            ScanAndCheckJottingController *controller = ControllerFactory::getInstance()->createScanAndCheckJottingController();
-            json j = controller->pushJottings();
-            std::string s = j.dump();
+            std::cout<<"Server << "<<request<<std::endl;
+            json j = m_scanAndCheckJottingController->pushJottings();
+            std::cout<<j.dump()<<std::endl;
+
             boostNetwork.sendMessage(j.dump());
+
         }else if(request == "PublishJottings"){
-            PublishJottingController *controller = ControllerFactory::getInstance()->createPublishJottingController();
-            std::string  isPub=controller->publishJottings(j);
+            std::string  isPub=m_publishJottingController->publishJottings(j);
             boostNetwork.sendMessage(isPub);
         }
 

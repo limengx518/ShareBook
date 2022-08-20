@@ -3,8 +3,9 @@
 
 #include "controller.h"
 #include <nlohmann/json.hpp>
+#include "base64.h"
 
-using json = nlohmann::json ;
+using json = nlohmann::json;
 
 class ScanAndCheckJottingController : public Controller
 {

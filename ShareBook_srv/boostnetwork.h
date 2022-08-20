@@ -24,6 +24,8 @@ class BoostNetwork
 {
 public:
     BoostNetwork(socket_ptr socket);
+    ~BoostNetwork();
+
     std::string receiveMessage();
     int sendMessage(std::string message);
 private:

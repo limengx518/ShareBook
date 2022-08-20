@@ -23,7 +23,10 @@ typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
 class BoostNetwork
 {
 public:
+    BoostNetwork();
     BoostNetwork(socket_ptr socket);
+    ~BoostNetwork();
+
     std::string receieveMessage();
     int sendMessage(std::string message);
 private:

@@ -15,6 +15,10 @@ BoostNetwork::BoostNetwork(socket_ptr socket)
     m_socket=socket;
 }
 
+BoostNetwork::~BoostNetwork()
+{
+}
+
 std::string BoostNetwork::receiveMessage()
 {
     boost::system::error_code error;

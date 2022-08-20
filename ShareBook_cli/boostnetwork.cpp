@@ -9,9 +9,18 @@
 using json=nlohmann::json;
 using boost::asio::ip::tcp;
 
-BoostNetwork::BoostNetwork(socket_ptr socket)
+BoostNetwork::BoostNetwork()
 {
-    m_socket=socket;
+
+}
+
+BoostNetwork::BoostNetwork(socket_ptr socket)
+    :m_socket(socket)
+{
+}
+
+BoostNetwork::~BoostNetwork()
+{
 }
 
 
@@ -19,6 +28,7 @@ std::string BoostNetwork::receieveMessage()
 {
     boost::system::error_code error;
     std::cout<<"receieve Message"<<std::endl;
+
 
     //首先接受所发数据的大小
     std::string messageSize(NUMLENGTH,' ');
@@ -29,9 +39,10 @@ std::string BoostNetwork::receieveMessage()
     else if (error)
         throw boost::system::system_error(error);
 
-//    std::cout<<"messageSize="<<messageSize<<std::endl;
     //然后将字符串转换为数字
     const size_t size=std::stoi(messageSize);
+    std::cout<<size<<std::endl;
+
     //定义大小为size的字符串缓冲区
     std::string buff(size,' ');
     //用read函数读出套接字中的所有内容
@@ -50,6 +61,7 @@ int BoostNetwork::sendMessage(std::string message)
     size_t size=message.length()*sizeof(char);
     std::string messageSize=std::to_string(size);
     size_t l=messageSize.length();
+
     if(l<NUMLENGTH){
         for(int i=0;i<NUMLENGTH-l;i++){
             messageSize.insert(0,"0");
@@ -60,6 +72,7 @@ int BoostNetwork::sendMessage(std::string message)
     if(n!=(messageSize.length()*sizeof(char))){
         return 0;
     }
+
 
     //然后发送数据
     n=boost::asio::write(*m_socket, boost::asio::buffer(message), ignored_error);

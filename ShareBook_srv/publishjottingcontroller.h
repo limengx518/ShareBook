@@ -2,6 +2,7 @@
 #define PUBLISHJOTTINGController_H
 
 #include "controller.h"
+#include "base64.h"
 #include <nlohmann/json.hpp>
 
 class PublishJottingController : public Controller

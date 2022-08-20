@@ -12,6 +12,7 @@
 #include "publishjottingcontroller.h"
 #include <iostream>
 
+
 PublishJottingController* PublishJottingController::m_instance = nullptr;
 
 PublishJottingController* PublishJottingController::getInstance()
@@ -24,9 +25,23 @@ PublishJottingController* PublishJottingController::getInstance()
 
 std::string  PublishJottingController::publishJottings(nlohmann::json j)
 {
-    std::cout<<"发布笔记详情:"<<j.dump()<<std::endl;
+    //将二进制流转为图片存储
+    string materialData = j["material"];
+    string material=base64_decode(materialData);
+    string materialPath = "/root/newMaterial.jpg";
+    std::ofstream fout(materialPath, std::ios::binary);
+    fout.write(material.c_str(), material.size());
+    fout.close();
 
-    return "请求发送material完整信息";
+    j["material"] = materialPath;
+    std::cout<<"发布笔记详情如下:"<<std::endl;
+    std::cout<<"==============================="<<std::endl;
+    std::cout<<"name : "<<j["name"]<<std::endl;
+    std::cout<<"content : "<<j["content"]<<std::endl;
+    std::cout<<"time : "<<j["time"]<<std::endl;
+    std::cout<<"material : "<<j["material"]<<std::endl;
+
+    return "服务端已接收您发布笔记的详细信息!";
 }
 
 PublishJottingController::PublishJottingController()

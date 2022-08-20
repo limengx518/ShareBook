@@ -8,11 +8,10 @@
 class Client
 {
 public:
-    Client(char *ipaddr);
-    void send(char *buf, size_t size);
-    void sendPic(char *buf, size_t size);
+    Client(const char *ipaddr);
+    void send(const char *buf, size_t size);
     void sendFile(char *buf, size_t size, std::string filePath);
-    std::string receive();
+    bool receive(char * buf);
     ~Client();
 private:
     Network  m_network;

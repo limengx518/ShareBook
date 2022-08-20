@@ -4,9 +4,11 @@
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
 #include "boostnetwork.h"
+#include "publishjottingcontroller.h"
+#include "scanandcheckjottingcontroller.h"
 #include "threadpool.h"
 
-#define BOOSERV_PORT 9876
+#define BOOSERV_PORT 9875
 
 class BoostServer
 {
@@ -16,5 +18,7 @@ public:
     void processClientRequest(socket_ptr scoket);
 private:
     ThreadPool m_threadPool;
+    ScanAndCheckJottingController *m_scanAndCheckJottingController;
+    PublishJottingController * m_publishJottingController;
 };
 #endif // BOOSTSERVER_H

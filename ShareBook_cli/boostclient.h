@@ -12,14 +12,25 @@
 #ifndef BOOSTCLIENT_H
 #define BOOSTCLIENT_H
 
-#define BOOSERV_PORT 9876
+#define BOOSERV_PORT 9875
+
+#include "boostnetwork.h"
+#include "scanandcheckjottingcontroller.h"
 #include <string>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 class BoostClient
 {
 public:
-    BoostClient();
-    void send(std::string serverIp, std::string message);
+    BoostClient(std::string serverIp);
+    void createAndConnect(std::string serverIp);
+    void send(std::string message);
+    std::string receive();
+    ~BoostClient();
+private:
+    BoostNetwork m_network;
 };
 
 #endif // BOOSTCLIENT_H

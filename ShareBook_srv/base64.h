@@ -1,4 +1,6 @@
-#include <iostream>
+#ifndef BASE64_H
+#define BASE64_H
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -19,7 +21,7 @@ static inline bool is_base64(const char c)
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 //编码
-std::string base64_encode(const char * bytes_to_encode, unsigned int in_len)
+static std::string base64_encode(const char * bytes_to_encode, unsigned int in_len)
 {
     std::string ret;
     int i = 0;
@@ -69,9 +71,8 @@ std::string base64_encode(const char * bytes_to_encode, unsigned int in_len)
     return ret;
 }
 
-
 //解码
-std::string base64_decode(std::string const & encoded_string)
+static std::string base64_decode(std::string const & encoded_string)
 {
     int in_len = (int) encoded_string.size();
     int i = 0;
@@ -112,3 +113,5 @@ std::string base64_decode(std::string const & encoded_string)
     return ret;
 }
 
+
+#endif // BASE64_H

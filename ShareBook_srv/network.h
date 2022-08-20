@@ -37,8 +37,7 @@ public:
 
 
     int sendMessage(char *buf, size_t size, int &connfd);
-    std::string receiveMessage(int &connfd);
-    bool receivePic(int &connfd, char *buffer);
+    bool receiveMessage(int &connfd,char* buffer);
 
     int sendFile(char *buf,size_t size, int &connfd, std::string filePath);
     std::string receiveFile(int &connfd, std::string filePath);

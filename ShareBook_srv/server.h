@@ -14,9 +14,8 @@ public:
     Server();
     void start();
 
-    std::string receiveMessage(int &connfd);
-    bool receivePic(int &connfd, char *buf);
-    void sendMessage(char *buf, size_t size, int &connfd);
+    bool receive(int &connfd, char *buf);
+    void send(char *buf, size_t size, int &connfd);
     void sendFile(char *buf, size_t size, int &connfd,std::string filePath);
 
     void processClientRequest(int &fd, json message);
