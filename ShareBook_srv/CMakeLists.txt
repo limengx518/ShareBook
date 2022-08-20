@@ -24,6 +24,10 @@ target_sources( ShareBook_srv PRIVATE
                 threadpool.cpp
                 network.cpp
                 threadsafequeue.cpp
+                rstp.cpp
+                rtp.cpp
+                h264datasource.cpp
+                aacdatasource.cpp
                 main.cpp )
 
 target_compile_features( ShareBook_srv PRIVATE cxx_std_20 )
@@ -34,6 +38,15 @@ target_link_libraries(ShareBook_srv
 #    mariadbcpp
     pthread
     nlohmann_json
+    avcodec
+    avformat
+    avdevice
+    avfilter
+    avutil
+    swresample
+    swscale
+    postproc
+#    -lSDL2 -libavutil
 )
 #target_compile_options( ShareBook_srv PRIVATE -fmodules-ts )
 
