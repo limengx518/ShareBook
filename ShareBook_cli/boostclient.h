@@ -12,7 +12,7 @@
 #ifndef BOOSTCLIENT_H
 #define BOOSTCLIENT_H
 
-#define BOOSERV_PORT 9875
+#define BOOSERV_PORT 9874
 
 #include "boostnetwork.h"
 #include "scanandcheckjottingcontroller.h"

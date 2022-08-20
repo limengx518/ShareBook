@@ -8,7 +8,7 @@
 #include "scanandcheckjottingcontroller.h"
 #include "threadpool.h"
 
-#define BOOSERV_PORT 9875
+#define BOOSERV_PORT 9874
 
 class BoostServer
 {

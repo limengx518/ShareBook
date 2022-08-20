@@ -1,5 +1,5 @@
-/run/media/root/study/ShareBook/ShareBook_srv/CMakeFiles/edit_cache.dir
-/run/media/root/study/ShareBook/ShareBook_srv/CMakeFiles/rebuild_cache.dir
-/run/media/root/study/ShareBook/ShareBook_srv/CMakeFiles/ShareBook_srv.dir
-/run/media/root/study/ShareBook/ShareBook_srv/json/CMakeFiles/edit_cache.dir
-/run/media/root/study/ShareBook/ShareBook_srv/json/CMakeFiles/rebuild_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_srv/CMakeFiles/ShareBook_srv.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_srv/CMakeFiles/edit_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_srv/CMakeFiles/rebuild_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_srv/json/CMakeFiles/edit_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_srv/json/CMakeFiles/rebuild_cache.dir

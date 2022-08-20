@@ -121,7 +121,6 @@ void scanB(){
 
     client.send(sendData);
     std::string receiveData =  client.receive();
-
     json jotting = json::parse(receiveData);
     //将二进制流转为图片存储
     string materialData = jotting["material"];
@@ -161,8 +160,8 @@ int main(int argc, char *argv[])
 //    std::thread t1(publishB),t2(scanB);
 //    t1.join();
 //    t2.join();
-    publishB();
-//    scanB();
+//    publishB();
+    scanB();
 
     return 0;
 }

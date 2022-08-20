@@ -36,11 +36,11 @@ public:
     ~Network();
 
 
-    int sendMessage(char *buf, size_t size, int &connfd);
-    bool receiveMessage(int &connfd,char* buffer);
+    int sendMessage(char *buf, size_t size);
+    bool receiveMessage(char* buffer);
 
-    int sendFile(char *buf,size_t size, int &connfd, std::string filePath);
-    std::string receiveFile(int &connfd, std::string filePath);
+    int sendFile(char *buf, size_t size, std::string filePath);
+    std::string receiveFile(std::string filePath);
 private:
     int m_listenFd;
 };

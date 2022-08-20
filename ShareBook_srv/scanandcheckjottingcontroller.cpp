@@ -25,6 +25,7 @@ ScanAndCheckJottingController *ScanAndCheckJottingController::getInstance()
 std::string encodePhoto(std::string photoPath){
     //将图片解码为二进制流
 
+    std::cout<<"进来函数 encodePhoto:"<<photoPath<<std::endl;
     std::ifstream fin(photoPath, std::ios::binary);
     fin.seekg(0, std::ios::end);
     int iSize = fin.tellg();
@@ -33,8 +34,11 @@ std::string encodePhoto(std::string photoPath){
     fin.read(szBuf, sizeof(char) * iSize);
     fin.close();
 
-    //图片解码后的二进制流 放进material
-    return base64_encode(szBuf,iSize);
+    std::cout<<"iSize== "<<iSize<<std::endl;
+
+    string data= base64_encode(szBuf,iSize);
+    //二进制流
+    return data;
 }
 
 
@@ -45,14 +49,13 @@ json ScanAndCheckJottingController::pushJottings()
         { "avator","头像1" },
         { "content", "今天也是美好的一天" },
         { "time", "2022-08-01 13:00:12" },
-        { "material", "root/02.jpg"}
+        { "material", "/root/02.jpg"}
     };
 
     //对图片进行解码为 二进制流
     std::string materialPath = jotting["material"];
-    std::cout<<materialPath<<std::endl;
+
     jotting["material"] = encodePhoto(materialPath);
-     std::cout<<jotting.dump()<<std::endl;
 
     return jotting;
 }

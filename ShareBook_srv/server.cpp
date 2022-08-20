@@ -32,11 +32,7 @@ void Server::start()
         if(network.pollSocket()){
             int connfd = network.acceptSocket();
             if(connfd<0) continue;
-            char buf[1000000];
-            network.receiveMessage(connfd,buf);
-            std::cout<<"Server<< 消息长度："<<strlen(buf)<<std::endl;
-            json j = json::parse(buf);
-            m_threadPool.submit(std::bind(&Server::processClientRequest,this, connfd,j));
+            m_threadPool.submit(std::bind(&Server::processClientRequest,this,connfd));
         };
     }
 
@@ -46,24 +42,30 @@ void Server::start()
 bool Server::receive(int &connfd,char * buf)
 {
     Network network(connfd);
-    return network.receiveMessage(connfd,buf);
+    return network.receiveMessage(buf);
 }
 
 void Server::send(char *buf, size_t size, int &connfd)
 {
     Network network(connfd);
-    network.sendMessage(buf,size,connfd);
+    network.sendMessage(buf,size);
 }
 
 void Server::sendFile(char *buf, size_t size, int &connfd,std::string filePath)
 {
     Network network(connfd);
-    network.sendFile(buf,size,connfd,filePath);
+    network.sendFile(buf,size,filePath);
 }
 
-void Server::processClientRequest(int& fd,json message)
+void Server::processClientRequest(int& fd)
 {
     try {
+        Network network(fd);
+        char buf[1000000];
+        network.receiveMessage(buf);
+        json message = json::parse(buf);
+        std::cout<<"Server<< 消息长度："<<strlen(buf)<<std::endl;
+
         if(message.empty()){
             std::cout<<"Server receieve nullptr"<<std::endl;
             return;
@@ -75,6 +77,7 @@ void Server::processClientRequest(int& fd,json message)
             //获得要推送的笔记 json信息
             json j = m_scanAndCheckJottingController->pushJottings();
             std::string s = j.dump();
+            std::cout<<s.size()<<std::endl;
             send(s.data(),s.size(),fd);
 
         }else if(request == "PublishJottings"){
@@ -91,7 +94,7 @@ void Server::processClientRequest(int& fd,json message)
 
 void Server::processClientFileRequest(int &fd, std::string filePath)
 {
-    Network network;
-    std::string str = network.receiveFile(fd,filePath);
+    Network network(fd);
+    std::string str = network.receiveFile(filePath);
 
 }

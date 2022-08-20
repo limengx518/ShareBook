@@ -38,7 +38,6 @@ void BoostServer::processClientRequest(socket_ptr s)
         if(request == "ScanJottings"){
             std::cout<<"Server << "<<request<<std::endl;
             json j = m_scanAndCheckJottingController->pushJottings();
-            std::cout<<j.dump()<<std::endl;
 
             boostNetwork.sendMessage(j.dump());
 

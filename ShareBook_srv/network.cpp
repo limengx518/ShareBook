@@ -66,11 +66,11 @@ int Network::acceptSocket()
 {
     struct sockaddr_in cliaddr;
     socklen_t clilen = sizeof(cliaddr);
-    int connfd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
-    if(connfd<0){
+    int m_listenFd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
+    if(m_listenFd<0){
         printf("Accept socket failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
-    return connfd;
+    return m_listenFd;
 }
 
 int Network::pollSocket()
@@ -95,20 +95,16 @@ void Network::closeSocket()
     close(m_listenFd);
 }
 
-int Network::sendMessage(char *buf,size_t size,int &connfd)
+int Network::sendMessage(char *buf,size_t size)
 {
-    if(connfd<0){
-        std::cerr<<"Server Socket error"<<std::endl;
-        return false;
-    }
     int send_size = 0 , msg_size = strlen(buf);
 
-    send_size = send(connfd, &msg_size, sizeof(4), 0);
+    send_size = send(m_listenFd, &msg_size, sizeof(4), 0);
 
     int pos = 0;
     std::string tmp(buf);
     while (msg_size > 0) {
-       send_size = send(connfd, buf+pos, 1024, 0);
+       send_size = send(m_listenFd, buf+pos, 1024, 0);
 
        if (send_size < 0) {
             printf("Server write error. Errorn info: %d %s\n",errno,strerror(errno));
@@ -122,11 +118,11 @@ int Network::sendMessage(char *buf,size_t size,int &connfd)
 }
 
 /*
-std::string Network::receiveMessage(int& connfd)
+std::string Network::receiveMessage(int& m_listenFd)
 {
     char buf[MAXLINE];
     memset(buf,0,sizeof(buf));
-    int n=recv(connfd,buf,sizeof(buf),0);
+    int n=recv(m_listenFd,buf,sizeof(buf),0);
     if( n == -1){
         if(errno == ECONNRESET || errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
             printf("Server read error. Errorn info: %d %s\n",errno,strerror(errno));
@@ -140,7 +136,7 @@ std::string Network::receiveMessage(int& connfd)
     return s;
 }*/
 
-bool Network::receiveMessage(int &connfd,char* buffer)
+bool Network::receiveMessage(char* buffer)
 {
     int one_size = 0,msg_size;
     std::string msg;
@@ -150,10 +146,10 @@ bool Network::receiveMessage(int &connfd,char* buffer)
 //    //我们使用一个int类型作为“包头”，代表发送数据的长度。
 //    //而int类型固定4字节，因此服务端每次先接受4字节的数据x，再接受x字节的字符串数据。
 
-    one_size = read(connfd,&msg_size,sizeof(4));
+    one_size = read(m_listenFd,&msg_size,sizeof(4));
     int pos = 0;
     while (msg_size > 0) {
-        one_size = recv(connfd, buffer+pos , 1024, 0);
+        one_size = recv(m_listenFd, buffer+pos , 1024, 0);
         if (one_size == 0) {
             printf("client disconnect\n");
             return false;
@@ -168,7 +164,7 @@ bool Network::receiveMessage(int &connfd,char* buffer)
     return true;
 }
 
-int Network::sendFile(char *buf, size_t size,  int &connfd,std::string filePath)
+int Network::sendFile(char *buf, size_t size, std::string filePath)
 {
     if(m_listenFd<0){
         printf("Client socket error.Errorn info: %d %s\n",errno,strerror(errno));
@@ -177,13 +173,13 @@ int Network::sendFile(char *buf, size_t size,  int &connfd,std::string filePath)
     FILE *fq;
     if( ( fq = fopen(filePath.c_str(),"rb") ) == NULL ){
         printf("File open.\n");
-        close(connfd);
+        close(m_listenFd);
         exit(1);
     }
     int len;
     while(!feof(fq)){
         len = fread(buf, 1, sizeof(buf), fq);
-        if(len != ::send(connfd, buf, len,0)){
+        if(len != ::send(m_listenFd, buf, len,0)){
             printf("Server file write error. Errorn info: %d %s\n",errno,strerror(errno));
             break;
         }
@@ -192,7 +188,7 @@ int Network::sendFile(char *buf, size_t size,  int &connfd,std::string filePath)
     return 1;
 }
 
-std::string Network::receiveFile(int &connfd,std::string filePath)
+std::string Network::receiveFile(std::string filePath)
 {
     FILE *fp;
     if((fp = fopen(filePath.c_str(),"ab")) == NULL ){
@@ -206,7 +202,7 @@ std::string Network::receiveFile(int &connfd,std::string filePath)
     int n;
 
     while(1){
-        n = ::recv(connfd, buf, MAXLINE,0);
+        n = ::recv(m_listenFd, buf, MAXLINE,0);
         if(n<0) printf("Server file read error. Errorn info: %d %s\n",errno,strerror(errno));
         if(n == 0) break;
         fwrite(buf, 1, n, fp);

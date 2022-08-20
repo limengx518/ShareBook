@@ -1,4 +1,8 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/ShareBook_srv.dir/boostnetwork.cpp.o"
+  "CMakeFiles/ShareBook_srv.dir/boostnetwork.cpp.o.d"
+  "CMakeFiles/ShareBook_srv.dir/boostserver.cpp.o"
+  "CMakeFiles/ShareBook_srv.dir/boostserver.cpp.o.d"
   "CMakeFiles/ShareBook_srv.dir/controller.cpp.o"
   "CMakeFiles/ShareBook_srv.dir/controller.cpp.o.d"
   "CMakeFiles/ShareBook_srv.dir/controllerfactory.cpp.o"

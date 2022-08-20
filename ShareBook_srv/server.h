@@ -16,9 +16,9 @@ public:
 
     bool receive(int &connfd, char *buf);
     void send(char *buf, size_t size, int &connfd);
-    void sendFile(char *buf, size_t size, int &connfd,std::string filePath);
+    void sendFile(char *buf, size_t size, int &connfd, std::string filePath);
 
-    void processClientRequest(int &fd, json message);
+    void processClientRequest(int &fd);
     void processClientFileRequest(int &fd,std::string filePath);
 private:
     ThreadPool m_threadPool;

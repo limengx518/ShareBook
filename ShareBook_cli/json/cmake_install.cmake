@@ -1,4 +1,4 @@
-# Install script for directory: /run/media/root/study/ShareBook/ShareBook_srv/json
+# Install script for directory: /run/media/root/work/想书/SB/ShareBook/ShareBook_cli/json
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

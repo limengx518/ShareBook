@@ -1,0 +1,6 @@
+/run/media/root/work/想书/SB/ShareBook/ShareBook_cli/CMakeFiles/ShareBook_cli.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_cli/CMakeFiles/edit_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_cli/CMakeFiles/rebuild_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_cli/CMakeFiles/ShareBook_cli_autogen.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_cli/json/CMakeFiles/edit_cache.dir
+/run/media/root/work/想书/SB/ShareBook/ShareBook_cli/json/CMakeFiles/rebuild_cache.dir

@@ -23,14 +23,14 @@ static inline bool is_base64(const char c)
 //编码
 static std::string base64_encode(const char * bytes_to_encode, unsigned int in_len)
 {
+    std::cout<<"进来编码"<<std::endl;
     std::string ret;
     int i = 0;
     int j = 0;
     unsigned char char_array_3[3];
     unsigned char char_array_4[4];
 
-    while (in_len--)
-    {
+    while (in_len--){
         char_array_3[i++] = *(bytes_to_encode++);
         if(i == 3)
         {
@@ -45,8 +45,7 @@ static std::string base64_encode(const char * bytes_to_encode, unsigned int in_l
             i = 0;
         }
     }
-    if(i)
-    {
+    if(i){
         for(j = i; j < 3; j++)
         {
             char_array_3[j] = '\0';

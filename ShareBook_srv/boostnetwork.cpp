@@ -35,7 +35,6 @@ std::string BoostNetwork::receiveMessage()
 
     //然后将字符串转换为数字
     const size_t size=std::stoi(messageSize);
-//    std::cout<<"messageSize="<<size<<std::endl;
     //定义大小为size的字符串缓冲区
     std::string buff(size,' ');
     //用read函数读出套接字中的所有内容
@@ -54,6 +53,9 @@ int BoostNetwork::sendMessage(std::string message)
     size_t size=message.length()*sizeof(char);
     std::string messageSize=std::to_string(size);
     size_t l=messageSize.length();
+
+    std::cout<<"要发送的数据大小: "<<messageSize<<std::endl;
+
     if(l<NUMLENGTH){
         for(int i=0;i<NUMLENGTH-l;i++){
             messageSize.insert(0,"0");

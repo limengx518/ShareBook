@@ -41,7 +41,6 @@ std::string BoostNetwork::receieveMessage()
 
     //然后将字符串转换为数字
     const size_t size=std::stoi(messageSize);
-    std::cout<<size<<std::endl;
 
     //定义大小为size的字符串缓冲区
     std::string buff(size,' ');

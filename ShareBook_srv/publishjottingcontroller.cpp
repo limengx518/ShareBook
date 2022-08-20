@@ -10,6 +10,7 @@
  * @history
  *****************************************************************************/
 #include "publishjottingcontroller.h"
+#include "json/include/nlohmann/json_fwd.hpp"
 #include <iostream>
 
 

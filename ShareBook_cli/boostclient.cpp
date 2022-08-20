@@ -21,12 +21,10 @@ BoostClient::BoostClient(std::string serverIp)
         std::cout<<"连接出错"<<std::endl;
     }
     m_network =  boost::make_shared<ip::tcp::socket>((std::move(s)));
-
 }
 
 void BoostClient::send(std::string message)
 {
-
     m_network.sendMessage(message);
 }
 

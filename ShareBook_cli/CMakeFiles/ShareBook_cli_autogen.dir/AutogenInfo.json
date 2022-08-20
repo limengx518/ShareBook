@@ -1,0 +1,197 @@
+{
+	"BUILD_DIR" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/ShareBook_cli_autogen",
+	"CMAKE_BINARY_DIR" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli",
+	"CMAKE_CURRENT_BINARY_DIR" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/CMakeLists.txt",
+		"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/CMakeFiles/3.23.2/CMakeSystem.cmake",
+		"/usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake",
+		"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/CMakeFiles/3.23.2/CMakeCXXCompiler.cmake",
+		"/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake",
+		"/usr/share/cmake/Modules/CMakeGenericSystem.cmake",
+		"/usr/share/cmake/Modules/CMakeInitializeConfigs.cmake",
+		"/usr/share/cmake/Modules/Platform/Linux.cmake",
+		"/usr/share/cmake/Modules/Platform/UnixPaths.cmake",
+		"/usr/share/cmake/Modules/CMakeCXXInformation.cmake",
+		"/usr/share/cmake/Modules/CMakeLanguageInformation.cmake",
+		"/usr/share/cmake/Modules/Compiler/GNU-CXX.cmake",
+		"/usr/share/cmake/Modules/Compiler/GNU.cmake",
+		"/usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"/usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake",
+		"/usr/share/cmake/Modules/Platform/Linux-GNU.cmake",
+		"/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake",
+		"/usr/lib64/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib64/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib64/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib64/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib64/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/usr/lib64/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"/usr/lib64/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"/usr/lib64/cmake/Qt5Core/Qt5CoreConfigExtras.cmake",
+		"/usr/lib64/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake",
+		"/usr/lib64/cmake/Qt5Core/Qt5CoreMacros.cmake",
+		"/usr/share/cmake/Modules/CMakeParseArguments.cmake",
+		"/usr/lib64/cmake/Qt5LinguistTools/Qt5LinguistToolsConfigVersion.cmake",
+		"/usr/lib64/cmake/Qt5LinguistTools/Qt5LinguistToolsConfig.cmake",
+		"/usr/lib64/cmake/Qt5LinguistTools/Qt5LinguistToolsMacros.cmake",
+		"/usr/share/cmake/Modules/CMakeParseArguments.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/boostclient.h",
+			"MU",
+			"EWIEGA46WW/moc_boostclient.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/boostnetwork.h",
+			"MU",
+			"EWIEGA46WW/moc_boostnetwork.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/client.h",
+			"MU",
+			"EWIEGA46WW/moc_client.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/controller.h",
+			"MU",
+			"EWIEGA46WW/moc_controller.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/controllerfactory.h",
+			"MU",
+			"EWIEGA46WW/moc_controllerfactory.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/network.h",
+			"MU",
+			"EWIEGA46WW/moc_network.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/publishjottingcontroller.h",
+			"MU",
+			"EWIEGA46WW/moc_publishjottingcontroller.cpp",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/scanandcheckjottingcontroller.h",
+			"MU",
+			"EWIEGA46WW/moc_scanandcheckjottingcontroller.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/ShareBook_cli_autogen/include",
+	"MOC_COMPILATION_FILE" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/ShareBook_cli_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : [ "QT_CORE_LIB", "QT_NO_DEBUG" ],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli",
+		"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/json/include",
+		"/usr/include/qt",
+		"/usr/include/qt/QtCore",
+		"/usr/lib/qt/mkspecs/linux-g++",
+		"/usr/include/c++/12.1.0",
+		"/usr/include/c++/12.1.0/x86_64-pc-linux-gnu",
+		"/usr/include/c++/12.1.0/backward",
+		"/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include",
+		"/usr/local/include",
+		"/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include-fixed",
+		"/usr/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/ShareBook_cli_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/CMakeFiles/ShareBook_cli_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/bin/moc",
+	"QT_UIC_EXECUTABLE" : "",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/CMakeFiles/ShareBook_cli_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/boostclient.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/boostnetwork.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/client.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/controller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/controllerfactory.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/network.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/publishjottingcontroller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/run/media/root/work/\u60f3\u4e66/SB/ShareBook/ShareBook_cli/scanandcheckjottingcontroller.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}
