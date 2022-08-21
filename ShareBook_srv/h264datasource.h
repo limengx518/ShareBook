@@ -30,24 +30,27 @@ extern "C" {
 }
 #endif
 
+#define MAX_FRAME_SIZE 1920*1080*3/8 //一帧数据大概的字节数
+
 class H264DataSource
 {
 public:
     H264DataSource(char* filePath);
-    int getFrames(char* filePath,unsigned int *result);
+    int getFrames(uint8_t *result[]);
+    //得到一帧的数据
+    int getFrame(char *frame[MAX_FRAME_SIZE]);
 private:
+    char* m_path;
     FILE* m_fp;
 
     //每一个帧前面带有0x00 00 00 01 或 0x00 00 01分隔符
     //判断是否是帧的起始字节
-    int isStartCode3(char* buf, int len);
-    int isStartCode4(char* buf, int len);
+    int isStartCode3(char* buf);
+    int isStartCode4(char* buf);
 
     //找到帧的起始点的位置
-    char *findStartCode(char* buf,int len);
+    char *findStartCode(char* buf);
 
-    //得到一帧的数据
-    int getFrame(char **frame);
 };
 
 #endif // H264DATASOURCE_H
