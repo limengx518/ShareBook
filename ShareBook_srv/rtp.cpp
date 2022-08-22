@@ -14,7 +14,9 @@ int RTP::sendFrames()
     for(int i=0;i<MAX_FRAME_NUM;i++){
         datas[i]=(char*)malloc( sizeof(char)*MAX_FRAME_SIZE);
     }
-    int frameNum=m_video.getFrame(datas);
+    int *size=(int* )malloc(sizeof(int)*MAX_FRAME_NUM);
+
+    int frameNum=m_video.getFrame(datas,size);
     if(frameNum<0){
         return -1;
     }
@@ -25,15 +27,10 @@ int RTP::sendFrames()
        //3，打开文件流对象
   ofs.open("/root/test/test.txt", std::ios::out);
 
-    for(int i=0;i<=frameNum;i++){
-        //4，写数据 “<<”
-//        ofs <<"第"<<i<<"帧"<<std::endl<<std::endl;
-//        std::string s(data[);
-//        ofs <<(datas[i]);
-        for(int j=0;j<MAX_FRAME_SIZE;j++){
-            if(datas[i][j]==' '){
-                break;
-            }
+    for(int i=0;i<frameNum;i++){
+        //4，写数据
+        for(int j=0;j<size[i];j++){
+            printf("%c",datas[i][j]);
             ofs<<datas[i][j];
         }
     }

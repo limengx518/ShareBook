@@ -37,15 +37,34 @@ int main()
 //    boostServer();
 
     int fd=0;
-    RTP rtp("/run/media/root/study/想书/New/ShareBook/ShareBook_srv/test.h264",fd);
+    RTP rtp("/root/test/test.h264",fd);
     rtp.sendFrames();
-    uint8_t* datas[1000]={};
+
+//    //以只读的方式打开文件
+//    FILE* p1=fopen("/root/test/1.h264","r");
+//    assert(p1!=NULL);
+//    FILE* p2=fopen("/root/test/test.h264","r");
+//    assert(p2!=NULL);
+
+//    while(!feof (p1)&&!feof(p2)){
+//        char c1=fgetc(p1);
+//        char c2=fgetc(p2);
+//        if(c1==c2){
+////            printf("%c,%c,不相同\n",c1,c2);
+////            break;
+//        }else{
+//            break;
+//        }
+//    }
+
+//    uint8_t* datas[1000]={};
 
 //    char *buf=(char* )malloc(sizeof(char)*10);
 //    memset(buf,0,10);
 //    for(int i=0;i<10;i++){
-//        printf("%c\n",buf[i]);
+//        printf("%s\n",buf[i]);
 //    }
+//    printf("%s",buf);
 
 
 

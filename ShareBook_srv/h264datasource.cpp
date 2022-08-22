@@ -90,6 +90,14 @@ int H264DataSource::isStartCode4(char *buf)
     return 0;
 }
 
+int H264DataSource::copyString(char *buf, char *frame, int len)
+{
+    for(int i=0;i<len;i++){
+        frame[i]=buf[i];
+    }
+    return 1;
+}
+
 char *H264DataSource::findStartCode(char *buf)
 {
     if(sizeof(buf)<3){
@@ -106,15 +114,15 @@ char *H264DataSource::findStartCode(char *buf)
     return NULL;
 }
 
-int H264DataSource::getFrame(char *frame[])
+int H264DataSource::getFrame(char *frame[],int* size)
 {
-    //表示开始的字节是4还是3
-    int frameNums=0;
-    std::ofstream ofs("/root/test/test.txt");
+//    FILE *p1=fopen("/root/test/test.txt","r+");
+//    assert(p1!=NULL);
 
+    char *buf=(char* )malloc(sizeof(char)*MAX_FRAME_SIZE);
+    int frameNums=0;
     while(1){
         int pos=0,StartCodeFound = 0, info3 = 0,info4 = 0,rewind=0;
-        char *buf=(char* )malloc(sizeof(char)*MAX_FRAME_SIZE);
         memset(buf,0,MAX_FRAME_SIZE);
 
         //读取3个字节，查看初始字节码
@@ -143,11 +151,12 @@ int H264DataSource::getFrame(char *frame[])
             //如果已经读取到文件末尾
             if (feof (m_fp)){
                 printf("H264DataSource::getFrames, read the end\n");
-                return frameNums;
+//                fclose(p1);
+                free(buf);
+                return frameNums+1;
             }
             //读取一个字符并将光标向后移动
             buf[pos++] = fgetc (m_fp);
-
             //判断是否是帧的起始符号
             info4 = isStartCode4(&buf[pos-4]);
             if(info4 != 1)
@@ -155,19 +164,9 @@ int H264DataSource::getFrame(char *frame[])
             StartCodeFound = (info3 == 1 || info4 == 1);
         }
         int n=info3==1?3:4;
-        //将读取到的帧进行处理
-        for(int i=0;i<n-1;i++){
-            buf[pos--]=' ';
-        }
-//        printf("%d\n",buf[pos-n-1]);
-//        for(int i=0;i<=pos;i++){
-//            std::ofstream ofs("/root/test/test.txt");
-//            ofs<<buf[i];
-//            printf("%s",buf[i]);
-//        }
-//        ofs.close();
-//        return 0;
-        frame[frameNums++]=buf;
+        copyString(buf,frame[frameNums],pos-n);
+        size[frameNums]=pos-n;
+        frameNums++;
 
         // Here, we have found another start code (and read length of startcode bytes more than we should
         // have.  Hence, go back in the file
@@ -175,10 +174,16 @@ int H264DataSource::getFrame(char *frame[])
         rewind = (info4 == 1)? -4 : -3;
 
         if (0 != fseek (m_fp, rewind, SEEK_CUR)){
+            free(buf);
             printf("H264DataSource::getFrames, Cannot fseek in the bit stream file\n");
             return -1;
         }
 
     }
 
+}
+
+H264DataSource::~H264DataSource()
+{
+    fclose(m_fp);
 }
