@@ -37,9 +37,10 @@ class H264DataSource
 public:
     H264DataSource(char* filePath);
     int getFrames(uint8_t *result[]);
-    //得到一帧的数据
+    //得到每一帧的数据
     int getFrame(char *frame[MAX_FRAME_SIZE], int *size);
     ~H264DataSource();
+
 private:
     char* m_path;
     FILE* m_fp;
@@ -53,7 +54,6 @@ private:
 
     //找到帧的起始点的位置
     char *findStartCode(char* buf);
-
 };
 
 #endif // H264DATASOURCE_H

@@ -10,6 +10,9 @@
  * @history
  *****************************************************************************/
 #include "network.h"
+#include <arpa/inet.h>
+#include <stdio.h>
+
 #define SERV_PORT 9877
 #define LISTENQ 1000
 #define INFTIM -1 //poll永远等待
@@ -62,15 +65,20 @@ int Network::listenSocket()
     return 0;
 }
 
-int Network::acceptSocket()
+int Network::acceptSocket(char *ipaddr, int size)
 {
     struct sockaddr_in cliaddr;
+    char buf[100];
     socklen_t clilen = sizeof(cliaddr);
-    int m_listenFd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
-    if(m_listenFd<0){
+    int fd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
+    inet_ntop(AF_INET, &cliaddr.sin_addr, buf, sizeof(buf));
+    printf("The client ip is %s ,port is %d\n",buf,ntohs(cliaddr.sin_port));
+    snprintf(ipaddr,size,"%s:%d",buf,ntohs(cliaddr.sin_port));
+
+    if(fd<0){
         printf("Accept socket failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
-    return m_listenFd;
+    return fd;
 }
 
 int Network::pollSocket()
@@ -84,6 +92,18 @@ int Network::pollSocket()
     return 1;
 
 }
+
+int Network::sendn(void *buff, int dataSize)
+{
+    return send(m_listenFd, buff, dataSize, 0);
+}
+
+int Network::receiven(char *buf, int bufSize)
+{
+    return recv(m_listenFd,buf,bufSize,0);
+//    return read(m_listenFd,buf,bufSize);
+}
+
 
 Network::~Network()
 {

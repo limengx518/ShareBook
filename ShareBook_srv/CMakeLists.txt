@@ -24,8 +24,8 @@ target_sources( ShareBook_srv PRIVATE
                 threadpool.cpp
                 network.cpp
                 threadsafequeue.cpp
-                rstp.cpp
                 rtp.cpp
+                rtsp.cpp
                 h264datasource.cpp
                 aacdatasource.cpp
                 main.cpp )

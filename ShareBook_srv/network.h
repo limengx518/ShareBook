@@ -30,9 +30,11 @@ public:
     int createSocket();
     int bindSocket();
     int listenSocket();
-    int acceptSocket();
+    int acceptSocket(char* ipaddr, int size);
     void closeSocket();
     int pollSocket();
+    int sendn(void* buff,int dataSize);
+    int receiven(char* buf,int bufSize);
     ~Network();
 
 

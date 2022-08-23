@@ -116,13 +116,11 @@ char *H264DataSource::findStartCode(char *buf)
 
 int H264DataSource::getFrame(char *frame[],int* size)
 {
-//    FILE *p1=fopen("/root/test/test.txt","r+");
-//    assert(p1!=NULL);
 
     char *buf=(char* )malloc(sizeof(char)*MAX_FRAME_SIZE);
     int frameNums=0;
     while(1){
-        int pos=0,StartCodeFound = 0, info3 = 0,info4 = 0,rewind=0;
+        int pos=0,StartCodeFound = 0, info3 = 0,info4 = 0,rewind=0,start=0;
         memset(buf,0,MAX_FRAME_SIZE);
 
         //读取3个字节，查看初始字节码
@@ -146,12 +144,12 @@ int H264DataSource::getFrame(char *frame[],int* size)
         }else{
             pos=3;
         }
+        start=pos;
 
         while (!StartCodeFound){
             //如果已经读取到文件末尾
             if (feof (m_fp)){
                 printf("H264DataSource::getFrames, read the end\n");
-//                fclose(p1);
                 free(buf);
                 return frameNums+1;
             }
@@ -164,8 +162,9 @@ int H264DataSource::getFrame(char *frame[],int* size)
             StartCodeFound = (info3 == 1 || info4 == 1);
         }
         int n=info3==1?3:4;
-        copyString(buf,frame[frameNums],pos-n);
-        size[frameNums]=pos-n;
+        //将起始字节去掉
+        copyString(&buf[start],frame[frameNums],pos-n);
+        size[frameNums]=pos-n-start;
         frameNums++;
 
         // Here, we have found another start code (and read length of startcode bytes more than we should
