@@ -28,12 +28,21 @@
  *      乱序重组或者请求重传
  *   4. timestamp字段表示该RTP包载荷首字节的采集时间戳，可以据其对声音和画面同步去抖。比较特殊的是，时间戳的单位不是秒，而是将采样的频率作为基本单位，使得
  *      时间戳单位精确度更高，如视频采样率是90000HZ,则时间戳的单位就为1/90000
- *   5.SSRC字段即同步源，用它区分不同分RTP包，实现时需要保证同意RTP会话中不能有相同的SSRC的值
+ *   5. SSRC字段即同步源，用它区分不同分RTP包，实现时需要保证同一RTP会话中不能有相同的SSRC的值
  *
  */
 
 #define MAX_FRAME_SIZE 1920*1080*3/8 //一帧数据大概的字节数
 #define MAX_FRAME_NUM  3*60*60*60 //3分钟视频的最大帧数
+#define MAX_RTPPACKET_SIZE 1500 //packet数据包的最大长度
+#define MAX_RTPHEADER_SIZE 12 //rtp头部的最小长度
+
+#define RTP_VER 1 //版本号
+#define RTP_PAYLOAD_TYPE_H264   96 //所传输的多媒体类型
+
+#define NALU_TYPE   0x1F
+#define NALU_F      0x80
+#define NALU_NRI    0x60
 
 struct RtpHeader
 {
@@ -66,6 +75,11 @@ struct RtpHeader
     uint32_t ssrc;
 };
 
+struct RtpPacket{
+    struct RtpHeader header;
+    char data[0];//数据
+};
+
 class RTP
 {
 public:
@@ -74,7 +88,20 @@ public:
 private:
     H264DataSource m_video;
     Network m_network;
+    //初始化RTPHeader
+    void initRtpHeader(struct RtpHeader& rtpHeader,
+                       uint8_t csrLen,uint8_t extension,uint8_t padding,uint8_t version,
+                       uint8_t payloadType,uint8_t marker,
+                       uint16_t seq,
+                       uint32_t timestamp,
+                       uint32_t ssrc);
 
+    //发送较小的数据帧
+    void sendFrameMin(char* data,int seq,int size);
+    //发送较大的数据帧
+    int sendFrameMax(char* data,int size,int seq);
+    //利用套接字发送数据帧
+    int sendPacket(struct RtpPacket* rtpPacket, int dataSize);
 };
 
 #endif // RTP_H
