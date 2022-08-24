@@ -13,7 +13,6 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 
-#define SERV_PORT 9877
 #define LISTENQ 1000
 #define INFTIM -1 //poll永远等待
 #define MAXLINE 1024
@@ -32,7 +31,6 @@ Network::Network(int &fd)
 {
 
 }
-
 int Network::createSocket()
 {
     m_listenFd = socket(AF_INET,SOCK_STREAM,0);
@@ -101,7 +99,19 @@ int Network::sendn(void *buff, int dataSize)
 int Network::receiven(char *buf, int bufSize)
 {
     return recv(m_listenFd,buf,bufSize,0);
-//    return read(m_listenFd,buf,bufSize);
+    //    return read(m_listenFd,buf,bufSize);
+}
+
+int Network::sendUdp()
+{
+//    extern ssize_t sendto (int __fd, const void *__buf, size_t __n,
+//                   int __flags, __CONST_SOCKADDR_ARG __addr,
+    //                   socklen_t __addr_len);
+}
+
+int Network::receiveUdp()
+{
+
 }
 
 

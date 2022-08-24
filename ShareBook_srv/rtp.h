@@ -84,10 +84,12 @@ class RTP
 {
 public:
     RTP(char* videoPath,int &fd);
-    int sendFrames();
+    int sendFrames(int port);
 private:
     H264DataSource m_video;
     Network m_network;
+    uint32_t m_timestamp;
+//    rtpPacket->rtpHeader.timestamp += 90000/25;
     //初始化RTPHeader
     void initRtpHeader(struct RtpHeader& rtpHeader,
                        uint8_t csrLen,uint8_t extension,uint8_t padding,uint8_t version,
@@ -97,9 +99,9 @@ private:
                        uint32_t ssrc);
 
     //发送较小的数据帧
-    void sendFrameMin(char* data,int seq,int size);
+    int sendFrameMin(char* data,int seq,int size);
     //发送较大的数据帧
-    int sendFrameMax(char* data,int size,int seq);
+    int sendFrameMax(char* data, int size, int &seq);
     //利用套接字发送数据帧
     int sendPacket(struct RtpPacket* rtpPacket, int dataSize);
 };

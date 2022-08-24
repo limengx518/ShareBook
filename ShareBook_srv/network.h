@@ -21,6 +21,7 @@
 #include <nlohmann/json.hpp>
 
 #define INVALID_SOCKET_FD -1
+#define SERV_PORT 9878
 
 class Network
 {
@@ -35,6 +36,8 @@ public:
     int pollSocket();
     int sendn(void* buff,int dataSize);
     int receiven(char* buf,int bufSize);
+    int sendUdp();
+    int receiveUdp();
     ~Network();
 
 

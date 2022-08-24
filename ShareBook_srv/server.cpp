@@ -39,7 +39,7 @@ void Server::start()
             sleep(1);
 //            if(connfd<0) continue;
 //            m_threadPool.submit(std::bind(&Server::processClientRequest,this,connfd));
-//            processRTSPRequest(connfd);
+//            processRTSPRequest(connfd,ipaddr);
             m_threadPool.submit(std::bind(&Server::processRTSPRequest,this,connfd,ipaddr));
 //        };
     }
@@ -108,7 +108,11 @@ void Server::processClientFileRequest(int &fd, std::string filePath)
 
 void Server::processRTSPRequest(int &fd, string ipaddr)
 {
-    std::cout<<"RTSP"<<std::endl;
-    RTSP rtsp(fd,ipaddr);
-    rtsp.start(fd);
+    try {
+        std::cout<<"RTSP"<<std::endl;
+        RTSP rtsp(fd,ipaddr);
+        rtsp.start(fd);
+    }  catch (...) {
+        std::cout<<"error"<<std::endl;
+    }
 }

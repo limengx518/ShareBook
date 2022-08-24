@@ -6,39 +6,50 @@
 RTP::RTP(char* videoPath, int &fd):
     m_video(videoPath),m_network(fd)
 {
-
+    m_timestamp=0;
 }
 
-int RTP::sendFrames()
+int RTP::sendFrames(int port)
 {
+    printf("----------------start play-----------\n");
+//    m_network.bindn(port);
     //对视频进行一帧一帧的解析然后发送
     char* datas[MAX_FRAME_NUM]={};
     for(int i=0;i<MAX_FRAME_NUM;i++){
-        datas[i]=(char*)malloc(sizeof(char)*MAX_FRAME_SIZE);
-        memset(datas[i],0,MAX_FRAME_SIZE);
+        datas[i]=(char* )malloc(sizeof(char)*MAX_FRAME_SIZE);
     }
     int *size=(int* )malloc(sizeof(int)*MAX_FRAME_NUM);
-    memset(size,0,MAX_FRAME_NUM);
 
     int frameNum=m_video.getFrame(datas,size);
     if(frameNum<0){
         return -1;
     }
     printf("共有%d帧数据\n",frameNum);
-    int seq=0;
+
+    int seq=1;
+//    sendFrameMin(datas[0],++seq,size[0]+MAX_RTPHEADER_SIZE);
+
     //将数据进行循环发送
     for(int i=0;i<frameNum;i++){
         if(size[i]<=MAX_RTPPACKET_SIZE-MAX_RTPHEADER_SIZE){
-            sendFrameMin(datas[i],++seq,size[i]+MAX_RTPHEADER_SIZE);
+            if(sendFrameMin(datas[i],++seq,size[i]+MAX_RTPHEADER_SIZE)<=0){
+                printf("send min error\n");
+                return -1;
+            }
         }else{
-            seq=sendFrameMax(datas[i],size[i],++seq);
+//            if(sendFrameMax(datas[i],size[i],++seq)<=0){
+//                printf("send max error\n");
+//            }
         }
+        //控制播放帧率
+        usleep(1000*1000/25);
     }
 
     for(int i=0;i<MAX_FRAME_NUM;i++){
         free(datas[i]);
     }
     free(size);
+    printf("全部发送完成\n");
 
     return 1;
 //    std::ofstream ofs;
@@ -71,7 +82,7 @@ void RTP::initRtpHeader(RtpHeader& rtpHeader, uint8_t csrLen, uint8_t extension,
     rtpHeader.ssrc=ssrc;
 }
 
-int RTP::sendFrameMax(char* data, int size, int seq)
+int RTP::sendFrameMax(char* data, int size, int& seq)
 {
     /*
      * nalu长度大于最大包长：分片模式，一个NALU分成几个RTP包（FUs模式）。
@@ -108,24 +119,25 @@ int RTP::sendFrameMax(char* data, int size, int seq)
      *   在对NAL单元进行分片时，应该将原始NAL单元中的头部去除，因为每一个FU-A分片已经包含了原始NAL单元头部的信息了
      */
 
+    printf("%s: size=%d, n=%d\n",__func__,size,seq);
     //完整的RTP包的个数
     int n=size/MAX_RTPPACKET_SIZE;
     //剩余不完整包的大小
-    int remain=size%MAX_FRAME_SIZE;
+    int remain=size%MAX_RTPPACKET_SIZE;
     //NALU头
     uint8_t naluHeader=data[0];
 
     //创建rtp包
-   struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_RTPPACKET_SIZE);
-   memset(rtpPacket,0,MAX_RTPPACKET_SIZE);
+   struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_FRAME_SIZE);
+   memset(rtpPacket,0,MAX_FRAME_SIZE);
 
     //对rtp包的头进行初始化
    initRtpHeader(rtpPacket->header,
                   0,0,0,RTP_VER,
                   RTP_PAYLOAD_TYPE_H264,0,
                   seq,
-                  0,
-                  0);
+                  m_timestamp,
+                  0x66668899);
    int pos=1;
 
     //发送完整的数据
@@ -164,10 +176,14 @@ int RTP::sendFrameMax(char* data, int size, int seq)
         memcpy(rtpPacket->data+2,data+pos,remain+2);
         int ret= sendPacket(rtpPacket,remain+2);
         if(ret<0){
-             return -1;
-         }
+            printf("send error\n");
+//            return -1;
+         }else if(ret==0){
+            printf("client close socket\n");
+//            return -1;
+        }
     }
-
+    m_timestamp+= 90000/25;
     free(rtpPacket);
     return seq;
 }
@@ -179,6 +195,7 @@ int RTP::sendPacket(RtpPacket *rtpPacket, int dataSize)
     rtpPacket->header.timestamp = htonl(rtpPacket->header.timestamp);
     rtpPacket->header.ssrc = htonl(rtpPacket->header.ssrc);
 
+    printf("dataSize=%d\n",dataSize);
     int ret=m_network.sendn((void*) rtpPacket,dataSize);
 
     rtpPacket->header.seq = ntohs(rtpPacket->header.seq);
@@ -188,18 +205,22 @@ int RTP::sendPacket(RtpPacket *rtpPacket, int dataSize)
     return ret;
 }
 
-void RTP::sendFrameMin(char *data, int seq, int size)
+int RTP::sendFrameMin(char *data, int seq, int size)
 {
+    printf("%s: size=%d,n=%d\n",__func__,size,seq);
     //创建rtp包
-   struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_RTPPACKET_SIZE);
+   struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_FRAME_SIZE);
    //对rtp包的头进行初始化
    initRtpHeader(rtpPacket->header,
                  0,0,0,RTP_VER,
                  RTP_PAYLOAD_TYPE_H264,0,
                  seq,
-                 0,
-                 0);
+                 m_timestamp,
+                 0x66668899);
    memcpy(rtpPacket->data, data, size);
-   sendPacket(rtpPacket,size);
+   int n=-1;
+   n=sendPacket(rtpPacket,size);
+   m_timestamp+= 90000/25;
    free(rtpPacket);
+   return n;
 }

@@ -35,12 +35,12 @@ int main()
 //    threadb.join();
 //    cServer();
 //    boostServer();
-        Server server;
-        server.start();
+    Server server;
+    server.start();
 
 
 //    int fd=0;
-//    RTP rtp("/root/test/test.h264",fd);
+//    RTP rtp("/root/test/001.h264",fd);
 //    rtp.sendFrames();
 
 //    //以只读的方式打开文件
