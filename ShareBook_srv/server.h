@@ -20,7 +20,7 @@ public:
 
     void processClientRequest(int &fd);
     void processClientFileRequest(int &fd,std::string filePath);
-    void processRTSPRequest(int &fd, std::string ipaddr);
+    void processRTSPRequest(int &fd, std::string ClientIp, int port);
 private:
     ThreadPool m_threadPool;
     ScanAndCheckJottingController *m_scanAndCheckJottingController;

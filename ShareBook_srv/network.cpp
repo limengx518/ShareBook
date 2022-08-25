@@ -12,6 +12,7 @@
 #include "network.h"
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <string.h>
 
 #define LISTENQ 1000
 #define INFTIM -1 //poll永远等待
@@ -35,18 +36,27 @@ int Network::createSocket()
 {
     m_listenFd = socket(AF_INET,SOCK_STREAM,0);
     if(m_listenFd==INVALID_SOCKET_FD){
-         printf("Create socket failed. Errorn info: %d %s\n",errno,strerror(errno));
+         printf("Create tcp socket failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
     return m_listenFd;
 }
 
-int Network::bindSocket()
+int Network::createUdpSocket()
+{
+    m_listenFd = socket(AF_INET,SOCK_DGRAM,0);
+    if(m_listenFd==INVALID_SOCKET_FD){
+         printf("Create udp socket failed. Errorn info: %d %s\n",errno,strerror(errno));
+    }
+    return m_listenFd;
+}
+
+int Network::bindSocket(char *ip, int port)
 {
     struct sockaddr_in servaddr;
     bzero(&servaddr,sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(SERV_PORT);
+    servaddr.sin_addr.s_addr = inet_addr(ip);
+    servaddr.sin_port = htons(port);
     if(bind(m_listenFd,(struct sockaddr *)&servaddr,sizeof(servaddr)) == -1){
         printf("Bind socket failed. Errorn info: %d %s\n",errno,strerror(errno));
         return -1;
@@ -63,7 +73,7 @@ int Network::listenSocket()
     return 0;
 }
 
-int Network::acceptSocket(char *ipaddr, int size)
+int Network::acceptSocket(char *ipaddr, int& port)
 {
     struct sockaddr_in cliaddr;
     char buf[100];
@@ -71,7 +81,9 @@ int Network::acceptSocket(char *ipaddr, int size)
     int fd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
     inet_ntop(AF_INET, &cliaddr.sin_addr, buf, sizeof(buf));
     printf("The client ip is %s ,port is %d\n",buf,ntohs(cliaddr.sin_port));
-    snprintf(ipaddr,size,"%s:%d",buf,ntohs(cliaddr.sin_port));
+    memcpy(ipaddr,buf,strlen(buf));
+    port=ntohs(cliaddr.sin_port);
+//    sprintf(ipaddr,port,"%s:%d",buf,ntohs(cliaddr.sin_port));
 
     if(fd<0){
         printf("Accept socket failed. Errorn info: %d %s\n",errno,strerror(errno));
@@ -102,16 +114,19 @@ int Network::receiven(char *buf, int bufSize)
     //    return read(m_listenFd,buf,bufSize);
 }
 
-int Network::sendUdp()
+int Network::sendUdp(const void* buf,size_t n,char* ip,int port)
 {
-//    extern ssize_t sendto (int __fd, const void *__buf, size_t __n,
-//                   int __flags, __CONST_SOCKADDR_ARG __addr,
-    //                   socklen_t __addr_len);
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port=htons(port);
+    addr.sin_addr.s_addr=inet_addr(ip);
+//    printf("%s,client ip is %s:%d\n",__func__,ip,port);
+
+    return sendto(m_listenFd,buf,n,0,(struct sockaddr*)&addr,sizeof(addr));
 }
 
-int Network::receiveUdp()
+int Network::receiveUdp(void *buf,size_t n,std::string ip,int port)
 {
-
 }
 
 

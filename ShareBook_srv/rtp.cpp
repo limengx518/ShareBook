@@ -1,22 +1,26 @@
 #include "rtp.h"
+#include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 
-RTP::RTP(char* videoPath, int &fd):
-    m_video(videoPath),m_network(fd)
+RTP::RTP(char* videoPath, std::string ip, int port):
+    m_video(videoPath),m_clientIp(ip),m_clientRtpPort(port)
 {
+    std::cout<<"客户端的地址为"<<m_clientIp<<":"<<m_clientRtpPort<<std::endl;
     m_timestamp=0;
+    m_rtp.createUdpSocket();
+    m_rtp.bindSocket(SERV_IP,RTP_PORT);
 }
 
-int RTP::sendFrames(int port)
+int RTP::sendFrames()
 {
     printf("----------------start play-----------\n");
 //    m_network.bindn(port);
     //对视频进行一帧一帧的解析然后发送
-    char* datas[MAX_FRAME_NUM]={};
+    uint8_t* datas[MAX_FRAME_NUM]={};
     for(int i=0;i<MAX_FRAME_NUM;i++){
-        datas[i]=(char* )malloc(sizeof(char)*MAX_FRAME_SIZE);
+        datas[i]=(uint8_t* )malloc(sizeof(uint8_t)*MAX_FRAME_SIZE);
     }
     int *size=(int* )malloc(sizeof(int)*MAX_FRAME_NUM);
 
@@ -26,30 +30,33 @@ int RTP::sendFrames(int port)
     }
     printf("共有%d帧数据\n",frameNum);
 
-    int seq=1;
+    int seq=0;
 //    sendFrameMin(datas[0],++seq,size[0]+MAX_RTPHEADER_SIZE);
 
     //将数据进行循环发送
     for(int i=0;i<frameNum;i++){
         if(size[i]<=MAX_RTPPACKET_SIZE-MAX_RTPHEADER_SIZE){
-            if(sendFrameMin(datas[i],++seq,size[i]+MAX_RTPHEADER_SIZE)<=0){
+            if(sendFrameMin(&datas[i][0],++seq,size[i])<=0){
                 printf("send min error\n");
                 return -1;
             }
         }else{
-//            if(sendFrameMax(datas[i],size[i],++seq)<=0){
-//                printf("send max error\n");
-//            }
+            if(sendFrameMax(&datas[i][0],size[i],++seq)<=0){
+                printf("sendc max error\n");
+                return -1;
+            }
         }
         //控制播放帧率
         usleep(1000*1000/25);
     }
 
+    printf("全部发送完成\n");
     for(int i=0;i<MAX_FRAME_NUM;i++){
         free(datas[i]);
     }
     free(size);
-    printf("全部发送完成\n");
+
+
 
     return 1;
 //    std::ofstream ofs;
@@ -69,6 +76,11 @@ int RTP::sendFrames(int port)
     //    ofs.close();
 }
 
+RTP::~RTP()
+{
+
+}
+
 void RTP::initRtpHeader(RtpHeader& rtpHeader, uint8_t csrLen, uint8_t extension, uint8_t padding, uint8_t version, uint8_t payloadType, uint8_t marker, uint16_t seq, uint32_t timestamp, uint32_t ssrc)
 {
     rtpHeader.csrcLen=csrLen;
@@ -82,7 +94,7 @@ void RTP::initRtpHeader(RtpHeader& rtpHeader, uint8_t csrLen, uint8_t extension,
     rtpHeader.ssrc=ssrc;
 }
 
-int RTP::sendFrameMax(char* data, int size, int& seq)
+int RTP::sendFrameMax(uint8_t* data, int size, int& seq)
 {
     /*
      * nalu长度大于最大包长：分片模式，一个NALU分成几个RTP包（FUs模式）。
@@ -119,7 +131,7 @@ int RTP::sendFrameMax(char* data, int size, int& seq)
      *   在对NAL单元进行分片时，应该将原始NAL单元中的头部去除，因为每一个FU-A分片已经包含了原始NAL单元头部的信息了
      */
 
-    printf("%s: size=%d, n=%d\n",__func__,size,seq);
+//    printf("%s: size=%d, n=%d\n",__func__,size,seq);
     //完整的RTP包的个数
     int n=size/MAX_RTPPACKET_SIZE;
     //剩余不完整包的大小
@@ -163,6 +175,8 @@ int RTP::sendFrameMax(char* data, int size, int& seq)
        }
        seq++;
        rtpPacket->header.seq=seq;
+       rtpPacket->header.timestamp=m_timestamp;
+       m_timestamp+= 90000/25;
        pos+=MAX_RTPPACKET_SIZE;
     }
 
@@ -183,33 +197,44 @@ int RTP::sendFrameMax(char* data, int size, int& seq)
 //            return -1;
         }
     }
-    m_timestamp+= 90000/25;
     free(rtpPacket);
     return seq;
 }
 
 int RTP::sendPacket(RtpPacket *rtpPacket, int dataSize)
 {
+    rtsp_interleaved *rtsp=(struct rtsp_interleaved*)malloc(MAX_RTPPACKET_SIZE+MAX_RTSPINTER_SIZE);
+    rtsp->magic='$';
+    rtsp->channel=0;
+    rtsp->rtp_len=dataSize;
+
+
     //将主机字节序变成网络字节序
     rtpPacket->header.seq = htons(rtpPacket->header.seq);
     rtpPacket->header.timestamp = htonl(rtpPacket->header.timestamp);
     rtpPacket->header.ssrc = htonl(rtpPacket->header.ssrc);
 
-    printf("dataSize=%d\n",dataSize);
-    int ret=m_network.sendn((void*) rtpPacket,dataSize);
-
+    rtsp->rtpPacket=*rtpPacket;
+//    printf("dataSize=%d\n",dataSize);
+    int ret=m_rtp.sendUdp((void*) rtpPacket,dataSize,m_clientIp.data(),m_clientRtpPort);
+//    for(int i=0;i<dataSize-MAX_RTPHEADER_SIZE;i++){
+//        printf("%X",rtpPacket->data[i]);
+//    }
+//    printf("\n");
+//    int ret=m_rtp.sendn((void*)rtpPacket,dataSize);
     rtpPacket->header.seq = ntohs(rtpPacket->header.seq);
     rtpPacket->header.timestamp = ntohl(rtpPacket->header.timestamp);
     rtpPacket->header.ssrc = ntohl(rtpPacket->header.ssrc);
 
+    free(rtsp);
     return ret;
 }
 
-int RTP::sendFrameMin(char *data, int seq, int size)
+int RTP::sendFrameMin(uint8_t* data, int seq, int size)
 {
-    printf("%s: size=%d,n=%d\n",__func__,size,seq);
+//    printf("%s: size=%d,n=%d\n",__func__,size,seq);
     //创建rtp包
-   struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_FRAME_SIZE);
+   struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_RTPPACKET_SIZE);
    //对rtp包的头进行初始化
    initRtpHeader(rtpPacket->header,
                  0,0,0,RTP_VER,
@@ -218,8 +243,14 @@ int RTP::sendFrameMin(char *data, int seq, int size)
                  m_timestamp,
                  0x66668899);
    memcpy(rtpPacket->data, data, size);
+
+//   for(int i=0;i<size;i++){
+//       printf("%X",rtpPacket->data[i]);
+//   }
+//   printf("\n");
+
    int n=-1;
-   n=sendPacket(rtpPacket,size);
+   n=sendPacket(rtpPacket,size+MAX_RTPHEADER_SIZE);
    m_timestamp+= 90000/25;
    free(rtpPacket);
    return n;

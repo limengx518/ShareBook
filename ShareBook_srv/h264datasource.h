@@ -38,7 +38,7 @@ public:
     H264DataSource(char* filePath);
     int getFrames(uint8_t *result[]);
     //得到每一帧的数据
-    int getFrame(char *frame[MAX_FRAME_SIZE], int *size);
+    int getFrame(uint8_t *frame[], int *size);
     ~H264DataSource();
 
 private:
@@ -49,8 +49,6 @@ private:
     //判断是否是帧的起始字节
     int isStartCode3(char* buf);
     int isStartCode4(char* buf);
-
-    int copyString(char* buf,char* frame,int len);
 
     //找到帧的起始点的位置
     char *findStartCode(char* buf);

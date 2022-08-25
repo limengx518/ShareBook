@@ -26,15 +26,14 @@
 #include "rtp.h"
 #include <map>
 
-#define SERVIP "192.168.176.249:9877"
-
 class RTSP
 {
 public:
-    RTSP(int& fd,std::string ipaddr);
+    RTSP(int& fd,std::string clientIp,int& port);
     int handleOptions();
     int handleDescribe();
-    int handleSetup();
+    int handleSetupTcp();
+    int handleSetupUdp();
     int handlePlay(int &fd);
     int handlePause();
     int handleTearDown();
@@ -43,10 +42,11 @@ public:
     ~RTSP();
 
 private:
-    RTP * m_rtp;
-    Network m_network;
+//    RTP * m_rtp;
+    Network m_rtsp;
     int m_cseq; //所接收的序列号
-    std::string m_ipaddr;//客户端的ip信息
+    std::string m_clientIp;//客户端的ip信息
+    int m_clientPort;//客户端的端口号
     int m_port0;//客户端的偶数端口号
     int m_port1;//客户端的奇数序列号
     std::string m_servIpaddr;//服务器端的ip信息

@@ -90,13 +90,6 @@ int H264DataSource::isStartCode4(char *buf)
     return 0;
 }
 
-int H264DataSource::copyString(char *buf, char *frame, int len)
-{
-    for(int i=0;i<len;i++){
-        frame[i]=buf[i];
-    }
-    return 1;
-}
 
 char *H264DataSource::findStartCode(char *buf)
 {
@@ -114,7 +107,7 @@ char *H264DataSource::findStartCode(char *buf)
     return NULL;
 }
 
-int H264DataSource::getFrame(char *frame[],int* size)
+int H264DataSource::getFrame(uint8_t *frame[], int* size)
 {
 
     char *buf=(char* )malloc(sizeof(char)*MAX_FRAME_SIZE);
@@ -161,9 +154,15 @@ int H264DataSource::getFrame(char *frame[],int* size)
                 info3 = isStartCode3(&buf[pos-3]);
             StartCodeFound = (info3 == 1 || info4 == 1);
         }
-        int n=info3==1?3:4;
+        int n=info4==1?4:3;
         //将起始字节去掉
-        copyString(&buf[start],frame[frameNums],pos-n);
+        memcpy(frame[frameNums],&buf[start],pos-n-start);
+//        printf("%s\n",frame[frameNums]);
+//        for(int i=0;i<pos-n-start;i++){
+//            printf("%X",frame[frameNums][i]);
+//        }
+//        printf("\n");
+
         size[frameNums]=pos-n-start;
         frameNums++;
 

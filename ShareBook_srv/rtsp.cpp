@@ -21,13 +21,14 @@
 
 
 
-RTSP::RTSP(int& fd,std::string ipaddr):
-    m_network(fd),
-    m_ipaddr(ipaddr)
+RTSP::RTSP(int& fd, std::string clientIp, int &port):
+    m_rtsp(fd),
+    m_clientIp(clientIp),
+    m_clientPort(port)
 {
     m_port0=-1;
     m_port1=-1;
-    m_servIpaddr=SERVIP;
+    m_servIpaddr=SERV_IP;
 }
 
 int RTSP::handleOptions()
@@ -43,7 +44,7 @@ int RTSP::handleOptions()
     std::cout<<result<<std::endl;
 
     //发送响应给客户端
-    return m_network.sendn(result,strlen(result));
+    return m_rtsp.sendn(result,strlen(result));
 
 }
 
@@ -76,51 +77,75 @@ int RTSP::handleDescribe()
     std::cout<<"---------------S->C--------------\n";
     std::cout<<result<<std::endl;
     //发送响应给客户端
-    return m_network.sendn(result,strlen(result));
+    return m_rtsp.sendn(result,strlen(result));
 
 }
 
-int RTSP::handleSetup()
+int RTSP::handleSetupTcp()
 {
     //SETUP请求的作用是指明媒体流该以什么方式传输；每个流PLAY之前必须执行SETUP操作；
     //发送SETUP请求时，客户端会指定两个端口，一个端口用于接收RTP数据；另一个端口接收RTCP数据，偶数端口用来接收RTP数据，相邻的奇数端口用于接收RTCP数据！
     char result[512];
     sprintf(result, "RTSP/1.0 200 OK\r\n"
                     "CSeq: %d\r\n"
-                    "Session: 337474243;timeout=60\r\n" //session应该是随机进行分配的本次会话连接的随机标识符，应该是根据时间随机进行生成的
-                    "Transport: RTP/AVP/TCP;interleaved=0-1;ssrc=66668899\r\n"
+                    "Transport: RTP/AVP/TCP;unicast;destination=%s;source=%s;interleaved=0-1" //tcp交互传输模式
+                    "Session: 337474243;timeout=600\r\n" //session应该是随机进行分配的本次会话连接的随机标识符，应该是根据时间随机进行生成的
                     "\r\n",
-                    m_cseq
+                    m_cseq,
+                    m_clientIp.c_str(),
+                    SERV_IP
             );
 
     std::cout<<"---------------S->C--------------\n";
     std::cout<<result<<std::endl;
     //发送响应给客户端
-    return m_network.sendn(result,strlen(result));
+    return m_rtsp.sendn(result,strlen(result));
+}
+
+int RTSP::handleSetupUdp()
+{
+    if(m_port0<0 || m_port1<0){
+        return -1;
+    }
+    //SETUP请求的作用是指明媒体流该以什么方式传输；每个流PLAY之前必须执行SETUP操作；
+    //发送SETUP请求时，客户端会指定两个端口，一个端口用于接收RTP数据；另一个端口接收RTCP数据，偶数端口用来接收RTP数据，相邻的奇数端口用于接收RTCP数据！
+    char result[512];
+    sprintf(result, "RTSP/1.0 200 OK\r\n"
+                    "CSeq: %d\r\n"
+                    "Transport: RTP/AVP;unicast;client_port=%d-%d;server_port=%d-%d;ssrc=66668899;mode=play\r\n"
+                    "Session: 337474243;timeout=600\r\n" //session应该是随机进行分配的本次会话连接的随机标识符，应该是根据时间随机进行生成的
+                    "\r\n",
+                    m_cseq,
+                    m_port0,
+                    m_port1,
+                    RTP_PORT,
+                    RTP_PORT+1
+            );
+
+    std::cout<<"---------------S->C--------------\n";
+    std::cout<<result<<std::endl;
+    //发送响应给客户端
+    return m_rtsp.sendn(result,strlen(result));
 }
 
 int RTSP::handlePlay(int & fd)
 {
-    try{
-        char path[]="/root/test/003.h264";
-        m_rtp=new RTP(path,fd);
-        char result[512];
-        sprintf(result, "RTSP/1.0 200 OK\r\n"
-                    "CSeq: %d\r\n"
-                    "Range: npt=0.000-\r\n"
-                    "Session: 337474243\n\r\n",
-                    m_cseq);
+    char path[]="/root/test/003.h264";
+    RTP *rtp=new RTP(path,m_clientIp,m_port0);
+    char result[512];
+    sprintf(result, "RTSP/1.0 200 OK\r\n"
+                "CSeq: %d\r\n"
+                "Range: npt=0.000-\r\n"
+                "Session: 337474243;timeout=600\r\n\r\n",
+                m_cseq);
 
-        std::cout<<"---------------S->C--------------\n";
-        std::cout<<result<<std::endl;
-        //发送响应给客户端
-        m_network.sendn(result,strlen(result));
-        return m_rtp->sendFrames(m_port0);
-    }catch(...){
-        printf("%s, catch error\n",__func__);
-    }
-
-
+    std::cout<<"---------------S->C--------------\n";
+    std::cout<<result<<std::endl;
+    //发送响应给客户端
+    m_rtsp.sendn(result,strlen(result));
+    int res= rtp->sendFrames();
+    delete rtp;
+    return res;
 }
 
 int RTSP::handlePause()
@@ -139,7 +164,7 @@ void RTSP::start(int& fd)
     char url[100];
     char version[40];
     char *bufPtr;
-    char* rBuf = (char*)malloc(1500);
+    char rBuf[1500];
     char line[400];
     int heartbeat = 0;
     int heartbeatcount = 0;
@@ -147,7 +172,7 @@ void RTSP::start(int& fd)
     {
         int recvLen;
         memset(rBuf,0,1500);
-        recvLen = m_network.receiven(rBuf,sizeof(char)*1500);
+        recvLen = m_rtsp.receiven(rBuf,sizeof(char)*1500);
         if(recvLen <= 0){
             printf("%s recvLen <=0 \n",__func__);
             break;
@@ -177,11 +202,21 @@ void RTSP::start(int& fd)
         if(!strcmp(method, "SETUP")){
             bufPtr =GetLineFromBuf(bufPtr,line);
             GetLineFromBuf(bufPtr,line);
-            if(sscanf(line,"Transport: RTP/AVP;unicast;client_port=%d-%d",&m_port0,&m_port1)!=2){
-                printf("%s parese err 3\n",__func__);
+            if(!strcmp(line,"Transport: RTP/AVP/TCP;unicast;interleaved=0-1")){//tcp交互传输模式
+                printf("handleSetup\n");
+                if(handleSetupTcp()<0){
+                    printf("SetUp udp error\n");
+                    break;
+                }
+            }else{
+                if(sscanf(line,"Transport: RTP/AVP;unicast;client_port=%d-%d",&m_port0,&m_port1)!=2){
+                    printf("%s parese err 3\n",__func__);
+                }
+                if(handleSetupUdp()<0){
+                    printf("SetUp tcp error\n");
+                    break;
+                }
             }
-            printf("handleSetup\n");
-            handleSetup();
         }
 
         if(!strcmp(method, "OPTIONS")){
@@ -212,16 +247,12 @@ void RTSP::start(int& fd)
             printf("handlePause\n");
             handlePause();
         }
-
-
     }
 
-    free(rBuf);
 }
 
 RTSP::~RTSP()
 {
-    delete m_rtp;
 }
 
 char*  RTSP:: GetLineFromBuf(char* buf, char* line)

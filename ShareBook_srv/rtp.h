@@ -30,19 +30,25 @@
  *      时间戳单位精确度更高，如视频采样率是90000HZ,则时间戳的单位就为1/90000
  *   5. SSRC字段即同步源，用它区分不同分RTP包，实现时需要保证同一RTP会话中不能有相同的SSRC的值
  *
+ *   由于本项目使用tcp进行通信，rtp和rtcp的包是在同一个端口中进行传输的，所以要将对rtp包进行再次封装，用以区分rtp包和rtcp包
+ *          $          信道数字 0或者1
+ *   | magic number | channel number |       data length      | data
+ *
  */
 
 #define MAX_FRAME_SIZE 1920*1080*3/8 //一帧数据大概的字节数
 #define MAX_FRAME_NUM  3*60*60*60 //3分钟视频的最大帧数
 #define MAX_RTPPACKET_SIZE 1500 //packet数据包的最大长度
 #define MAX_RTPHEADER_SIZE 12 //rtp头部的最小长度
+#define MAX_RTSPINTER_SIZE 4 //rtsp头部的长度
 
-#define RTP_VER 1 //版本号
+#define RTP_VER 2 //版本号
 #define RTP_PAYLOAD_TYPE_H264   96 //所传输的多媒体类型
 
 #define NALU_TYPE   0x1F
 #define NALU_F      0x80
 #define NALU_NRI    0x60
+
 
 struct RtpHeader
 {
@@ -77,18 +83,29 @@ struct RtpHeader
 
 struct RtpPacket{
     struct RtpHeader header;
-    char data[0];//数据
+    uint8_t data[0];//数据
+};
+
+struct rtsp_interleaved
+{
+    unsigned int magic : 8;// $
+    unsigned int channel : 8; //0-1
+    unsigned int rtp_len : 16;
+    RtpPacket rtpPacket;
 };
 
 class RTP
 {
 public:
-    RTP(char* videoPath,int &fd);
-    int sendFrames(int port);
+    RTP(char* videoPath,std::string ip, int port);
+    int sendFrames();
+    ~RTP();
 private:
     H264DataSource m_video;
-    Network m_network;
+    Network m_rtp;
     uint32_t m_timestamp;
+    std::string m_clientIp;
+    int m_clientRtpPort;
 //    rtpPacket->rtpHeader.timestamp += 90000/25;
     //初始化RTPHeader
     void initRtpHeader(struct RtpHeader& rtpHeader,
@@ -99,9 +116,9 @@ private:
                        uint32_t ssrc);
 
     //发送较小的数据帧
-    int sendFrameMin(char* data,int seq,int size);
+    int sendFrameMin(uint8_t *data, int seq, int size);
     //发送较大的数据帧
-    int sendFrameMax(char* data, int size, int &seq);
+    int sendFrameMax(uint8_t *data, int size, int &seq);
     //利用套接字发送数据帧
     int sendPacket(struct RtpPacket* rtpPacket, int dataSize);
 };

@@ -22,6 +22,8 @@
 
 #define INVALID_SOCKET_FD -1
 #define SERV_PORT 9878
+#define RTP_PORT 9888
+#define SERV_IP "192.168.205.249"
 
 class Network
 {
@@ -29,15 +31,16 @@ public:
     Network();
     Network(int &fd);
     int createSocket();
-    int bindSocket();
+    int createUdpSocket();
+    int bindSocket(char* ip=SERV_IP, int port=SERV_PORT);
     int listenSocket();
-    int acceptSocket(char* ipaddr, int size);
+    int acceptSocket(char* ipaddr, int &port);
     void closeSocket();
     int pollSocket();
     int sendn(void* buff,int dataSize);
     int receiven(char* buf,int bufSize);
-    int sendUdp();
-    int receiveUdp();
+    int sendUdp(const void *buf, size_t n, char *ip, int port);
+    int receiveUdp(void *buf, size_t n, std::string ip, int port);
     ~Network();
 
 

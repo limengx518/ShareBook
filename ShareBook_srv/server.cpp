@@ -25,7 +25,8 @@ Server::Server()
 
 void Server::start()
 {
-    char ipaddr[IPADDR_SIZE];
+    char clientIp[IPADDR_SIZE];
+    int port;
     //创建套接字
     Network network;
     network.createSocket();
@@ -34,15 +35,14 @@ void Server::start()
 //    while(1){
         std::cout<<"等待连接"<<std::endl;
         if(network.pollSocket()){
-//            std:cout<<"连接成功"<<std::endl;
-            int connfd = network.acceptSocket(ipaddr,IPADDR_SIZE);
+            int connfd = network.acceptSocket(clientIp,port);
             sleep(1);
 //            if(connfd<0) continue;
 //            m_threadPool.submit(std::bind(&Server::processClientRequest,this,connfd));
 //            processRTSPRequest(connfd,ipaddr);
-            m_threadPool.submit(std::bind(&Server::processRTSPRequest,this,connfd,ipaddr));
-//        };
-    }
+            m_threadPool.submit(std::bind(&Server::processRTSPRequest,this,connfd,clientIp,port));
+        };
+//    }
 
     network.closeSocket();
 }
@@ -106,11 +106,11 @@ void Server::processClientFileRequest(int &fd, std::string filePath)
 
 }
 
-void Server::processRTSPRequest(int &fd, string ipaddr)
+void Server::processRTSPRequest(int &fd, string ClientIp,int port)
 {
     try {
         std::cout<<"RTSP"<<std::endl;
-        RTSP rtsp(fd,ipaddr);
+        RTSP rtsp(fd,ClientIp,port);
         rtsp.start(fd);
     }  catch (...) {
         std::cout<<"error"<<std::endl;
