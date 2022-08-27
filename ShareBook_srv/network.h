@@ -23,7 +23,7 @@
 #define INVALID_SOCKET_FD -1
 #define SERV_PORT 9878
 #define RTP_PORT 9888
-#define SERV_IP "192.168.205.249"
+#define SERV_IP "192.168.41.249"
 
 class Network
 {

@@ -41,8 +41,8 @@ void Server::start()
 //            m_threadPool.submit(std::bind(&Server::processClientRequest,this,connfd));
 //            processRTSPRequest(connfd,ipaddr);
             m_threadPool.submit(std::bind(&Server::processRTSPRequest,this,connfd,clientIp,port));
-        };
-//    }
+//        };
+    }
 
     network.closeSocket();
 }

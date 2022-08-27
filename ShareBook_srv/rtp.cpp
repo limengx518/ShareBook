@@ -35,19 +35,21 @@ int RTP::sendFrames()
 
     //将数据进行循环发送
     for(int i=0;i<frameNum;i++){
-        if(size[i]<=MAX_RTPPACKET_SIZE-MAX_RTPHEADER_SIZE){
-            if(sendFrameMin(&datas[i][0],++seq,size[i])<=0){
+        if(size[i]<=MAX_RTPPACKET_SIZE){
+            if(sendFrameMin(&datas[i][0],seq,size[i])<=0){
                 printf("send min error\n");
                 return -1;
             }
         }else{
-            if(sendFrameMax(&datas[i][0],size[i],++seq)<=0){
+            if(sendFrameMax(&datas[i][0],size[i],seq)<=0){
                 printf("sendc max error\n");
                 return -1;
             }
         }
+        seq++;
         //控制播放帧率
         usleep(1000*1000/25);
+        m_timestamp+= 90000/25;
     }
 
     printf("全部发送完成\n");
@@ -131,7 +133,7 @@ int RTP::sendFrameMax(uint8_t* data, int size, int& seq)
      *   在对NAL单元进行分片时，应该将原始NAL单元中的头部去除，因为每一个FU-A分片已经包含了原始NAL单元头部的信息了
      */
 
-//    printf("%s: size=%d, n=%d\n",__func__,size,seq);
+    printf("%s: size=%d, n=%d\n",__func__,size,seq);
     //完整的RTP包的个数
     int n=size/MAX_RTPPACKET_SIZE;
     //剩余不完整包的大小
@@ -169,14 +171,12 @@ int RTP::sendFrameMax(uint8_t* data, int size, int& seq)
        memcpy(rtpPacket->data+2,data+pos,MAX_RTPPACKET_SIZE);
 
        //发送RTP包
-       int ret= sendPacket(rtpPacket,MAX_RTPPACKET_SIZE);
+       int ret= sendPacket(rtpPacket,MAX_RTPPACKET_SIZE+MAX_RTPHEADER_SIZE+2);
        if(ret<0){
            return -1;
        }
        seq++;
        rtpPacket->header.seq=seq;
-       rtpPacket->header.timestamp=m_timestamp;
-       m_timestamp+= 90000/25;
        pos+=MAX_RTPPACKET_SIZE;
     }
 
@@ -188,7 +188,7 @@ int RTP::sendFrameMax(uint8_t* data, int size, int& seq)
         rtpPacket->data[1] |= 0x40; //E位是1 ->0100 0000
         //把NALU数据填充到RTP包数据段
         memcpy(rtpPacket->data+2,data+pos,remain+2);
-        int ret= sendPacket(rtpPacket,remain+2);
+        int ret= sendPacket(rtpPacket,remain+2+MAX_RTPHEADER_SIZE);
         if(ret<0){
             printf("send error\n");
 //            return -1;
@@ -196,6 +196,7 @@ int RTP::sendFrameMax(uint8_t* data, int size, int& seq)
             printf("client close socket\n");
 //            return -1;
         }
+        seq++;
     }
     free(rtpPacket);
     return seq;
@@ -232,7 +233,7 @@ int RTP::sendPacket(RtpPacket *rtpPacket, int dataSize)
 
 int RTP::sendFrameMin(uint8_t* data, int seq, int size)
 {
-//    printf("%s: size=%d,n=%d\n",__func__,size,seq);
+    printf("%s: size=%d,n=%d\n",__func__,size,seq);
     //创建rtp包
    struct RtpPacket* rtpPacket = (struct RtpPacket*)malloc(MAX_RTPPACKET_SIZE);
    //对rtp包的头进行初始化
@@ -251,7 +252,6 @@ int RTP::sendFrameMin(uint8_t* data, int seq, int size)
 
    int n=-1;
    n=sendPacket(rtpPacket,size+MAX_RTPHEADER_SIZE);
-   m_timestamp+= 90000/25;
    free(rtpPacket);
    return n;
 }

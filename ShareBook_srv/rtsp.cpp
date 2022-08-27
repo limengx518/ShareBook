@@ -37,7 +37,7 @@ int RTSP::handleOptions()
     char result[500];
     sprintf(result, "RTSP/1.0 200 OK\r\n"
                     "CSeq: %d\r\n"
-                    "Public: OPTIONS, DESCRIBE, SETUP, PLAY, TEARDOWN, PAUSE\r\n"
+                    "Public: OPTIONS, DESCRIBE, SETUP, PLAY, TEARDOWN\r\n"
                     "\r\n",
                     m_cseq);
     std::cout<<"---------------S->C--------------\n";
@@ -130,7 +130,7 @@ int RTSP::handleSetupUdp()
 
 int RTSP::handlePlay(int & fd)
 {
-    char path[]="/root/test/003.h264";
+    char path[]="/root/test/004.h264";
     RTP *rtp=new RTP(path,m_clientIp,m_port0);
     char result[512];
     sprintf(result, "RTSP/1.0 200 OK\r\n"
@@ -155,7 +155,17 @@ int RTSP::handlePause()
 
 int RTSP::handleTearDown()
 {
+    char result[512];
+    sprintf(result,"RTSP/1.0 200 OK\r\n"
+                   "CSeq: %d\r\n"
+                   "Session: 337474243\r\n",
+            m_cseq
+            );
 
+    std::cout<<"---------------S->C--------------\n";
+    std::cout<<result<<std::endl;
+    //发送响应给客户端
+    return m_rtsp.sendn(result,strlen(result));
 }
 
 void RTSP::start(int& fd)
@@ -241,12 +251,15 @@ void RTSP::start(int& fd)
         if(!strcmp(method, "TEARDOWN")){
             printf("handleTearDown\n");
             handleTearDown();
+            //关闭套接字，结束会话
+            m_rtsp.closeSocket();
+            break;
         }
 
-        if(!strcmp(method,"PAUSE")){
-            printf("handlePause\n");
-            handlePause();
-        }
+//        if(!strcmp(method,"PAUSE")){
+//            printf("handlePause\n");
+//            handlePause();
+//        }
     }
 
 }
