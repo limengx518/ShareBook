@@ -14,11 +14,14 @@
 
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
 #include <poll.h>
 #include <nlohmann/json.hpp>
+#include <fcntl.h>
 
 #define INVALID_SOCKET_FD -1
 
@@ -39,6 +42,7 @@ public:
     int sendMessage(char *buf, size_t size);
     bool receiveMessage(char* buffer);
 
+    int sendFile(std::string path);
     int sendFile(char *buf, size_t size, std::string filePath);
     std::string receiveFile(std::string filePath);
 private:

@@ -4,6 +4,7 @@
 #include "network.h"
 #include "threadpool.h"
 #include "controllerfactory.h"
+#include "cacheflush.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -24,6 +25,9 @@ private:
     ThreadPool m_threadPool;
     ScanAndCheckJottingController *m_scanAndCheckJottingController;
     PublishJottingController * m_publishJottingController;
+    InitController *m_initController;
+    CacheFlush *m_cacheFlush;
+    MessageController *m_messageController;
 };
 
 #endif // SERVER_H

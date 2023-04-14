@@ -10,6 +10,7 @@ class PublishJottingController : public Controller
 public:
      static PublishJottingController *getInstance();
      std::string publishJottings(nlohmann::json j);
+     void comment(std::string netizenId,std::string comment,std::string jottingId);
 private:
      PublishJottingController();
      static PublishJottingController* m_instance;

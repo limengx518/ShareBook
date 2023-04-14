@@ -11,7 +11,9 @@ class ScanAndCheckJottingController : public Controller
 {
 public:
     static ScanAndCheckJottingController *getInstance();
-    json pushJottings();
+    json pushJottings(std::string netizenId);
+    json pushJottingDetial(std::string netizenId,std::string jottingId);
+    json pushInfoJottingDetail(std::string netizenId,std::string jottingId);
 private:
     ScanAndCheckJottingController();
     static ScanAndCheckJottingController* m_instance;

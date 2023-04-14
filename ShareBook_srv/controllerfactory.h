@@ -2,8 +2,11 @@
 #define ControllerFACTORY_H
 
 #include "controller.h"
+#include "messagecontroller.h"
 #include "publishjottingcontroller.h"
 #include "scanandcheckjottingcontroller.h"
+#include "initcontroller.h"
+#include "cacheflush.h"
 
 class ControllerFactory
 {
@@ -13,6 +16,9 @@ public:
 
     PublishJottingController* createPublishJottingController();
     ScanAndCheckJottingController* createScanAndCheckJottingController();
+    InitController *createInitController();
+    CacheFlush *createCacheFlush();
+    MessageController *createMessageController();
 private:
     ControllerFactory();
     static ControllerFactory* m_instance;

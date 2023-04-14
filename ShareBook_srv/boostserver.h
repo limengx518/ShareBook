@@ -7,6 +7,7 @@
 #include "publishjottingcontroller.h"
 #include "scanandcheckjottingcontroller.h"
 #include "threadpool.h"
+#include "initcontroller.h"
 
 #define BOOSERV_PORT 9874
 
@@ -20,5 +21,6 @@ private:
     ThreadPool m_threadPool;
     ScanAndCheckJottingController *m_scanAndCheckJottingController;
     PublishJottingController * m_publishJottingController;
+    InitController *m_initController;
 };
 #endif // BOOSTSERVER_H

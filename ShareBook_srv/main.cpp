@@ -14,23 +14,18 @@
 
 #include "boostserver.h"
 #include "server.h"
-
-
-void boostServer(){
-    BoostServer boostServer;
-    boostServer.start();
-}
-void cServer(){
-    Server server;
-    server.start();
-}
+#include "test.h"
+#include "relationalbroker.h"
 
 int main()
 {
-//    std::thread threada(boostServer);
-//    std::thread threadb(cServer);
-//    threada.join();
-//    threadb.join();
-//    cServer();
-    boostServer();
+    //进行数据库的初始化操作
+//    RelationalBroker rb;
+//    rb.initDataBase();
+
+//    BoostServer boostServer;
+//    boostServer.start();
+
+    Server server;
+    server.start();
 }

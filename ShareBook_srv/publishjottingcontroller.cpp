@@ -12,7 +12,8 @@
 #include "publishjottingcontroller.h"
 #include "json/include/nlohmann/json_fwd.hpp"
 #include <iostream>
-
+#include "netizen.h"
+#include "netizenbroker.h"
 
 PublishJottingController* PublishJottingController::m_instance = nullptr;
 
@@ -43,6 +44,12 @@ std::string  PublishJottingController::publishJottings(nlohmann::json j)
     std::cout<<"material : "<<j["material"]<<std::endl;
 
     return "服务端已接收您发布笔记的详细信息!";
+}
+
+void PublishJottingController::comment(string netizenId,std::string comment,std::string jottingId)
+{
+     Netizen &netizen=NetizenBroker::getInstance()->findById(netizenId);
+     netizen.comment(comment,jottingId);
 }
 
 PublishJottingController::PublishJottingController()

@@ -61,7 +61,7 @@ int BoostNetwork::sendMessage(std::string message)
             messageSize.insert(0,"0");
         }
     }
-//    std::cout<<"send message size="<<messageSize<<std::endl;
+    std::cout<<"send message size="<<messageSize<<std::endl;
      //写操作可能不会将所有的数据传输给对等体。如果需要确保在阻塞操作完成之前写入所有数据，可以考虑使用write函数。
     size_t n=boost::asio::write(*m_socket, boost::asio::buffer(messageSize), ignored_error);
     std::cout<<"发送完成"<<std::endl;

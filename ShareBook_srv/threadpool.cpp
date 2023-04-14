@@ -15,8 +15,7 @@ ThreadPool::ThreadPool()
     :m_done(false)
 {
     //硬件所能支持的最大线程数量
-//    unsigned const thread_count = std::thread::hardware_concurrency();
-        unsigned const thread_count = 1000;
+    unsigned const thread_count = std::thread::hardware_concurrency();
     try{
         for(unsigned i = 0; i<thread_count;++i){
             m_threads.push_back(std::thread(&ThreadPool::worker_thread,this));

@@ -10,6 +10,9 @@
  * @history
  *****************************************************************************/
 #include "network.h"
+#include "encodephoto.h"
+
+
 #define SERV_PORT 9877
 #define LISTENQ 1000
 #define INFTIM -1 //poll永远等待
@@ -66,11 +69,11 @@ int Network::acceptSocket()
 {
     struct sockaddr_in cliaddr;
     socklen_t clilen = sizeof(cliaddr);
-    int m_listenFd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
-    if(m_listenFd<0){
+    int listenFd = accept(m_listenFd, (struct sockaddr *)&cliaddr,&clilen);
+    if(listenFd<0){
         printf("Accept socket failed. Errorn info: %d %s\n",errno,strerror(errno));
     }
-    return m_listenFd;
+    return listenFd;
 }
 
 int Network::pollSocket()
@@ -99,7 +102,7 @@ int Network::sendMessage(char *buf,size_t size)
 {
     int send_size = 0 , msg_size = strlen(buf);
 
-    send_size = send(m_listenFd, &msg_size, sizeof(4), 0);
+    send_size = send(m_listenFd, &msg_size, sizeof(5), 0);
 
     int pos = 0;
     std::string tmp(buf);
@@ -162,6 +165,25 @@ bool Network::receiveMessage(char* buffer)
         msg_size -= one_size;
     }
     return true;
+}
+
+int Network::sendFile(std::string path)
+{
+//    int file_fd = open(path.c_str(),O_RDWR | O_CREAT,664);
+//    if(file_fd < 0){
+//        perror("open");
+//        return -1;
+//     }
+//           //6、//设置file_fd文件描述符属性
+//     struct stat stat_buf;
+//     stat(path.c_str(),&stat_buf);
+//     auto size = stat_buf.st_size;
+//    int size1=sendfile(m_listenFd,file_fd,nullptr,size);
+//    std::cout<<"传输的数据为"<<size1<<"字节"<<std::endl;
+
+    std::string photo=encodePhoto(path);
+
+    return 1;
 }
 
 int Network::sendFile(char *buf, size_t size, std::string filePath)

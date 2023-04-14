@@ -20,10 +20,34 @@ target_sources( ShareBook_srv PRIVATE
                 controllerfactory.cpp
                 scanandcheckjottingcontroller.cpp
                 publishjottingcontroller.cpp
-                server.cpp
                 threadpool.cpp
+                comment.cpp
+                commentbroker.cpp
+                commentinterface.cpp
+                commentproxy.cpp
+                cacheflush.cpp
+                jotting.cpp
+                jottingbroker.cpp
+                jottinginterface.cpp
+                jottingnotification.cpp
+                jottingproxy.cpp
+                material.cpp
+                materialbroker.cpp
+                materialinterface.cpp
+                materialproxy.cpp
+                messagesequence.cpp
+                messagecontroller.cpp
+                mytimer.cpp
+                netizen.cpp
+                netizenbroker.cpp
+                netizeninterface.cpp
+                netizenproxy.cpp
+                relationalbroker.cpp
+                snowflakeidworker.cpp
+                initcontroller.cpp
+                encodephoto.cpp
                 network.cpp
-                threadsafequeue.cpp
+                server.cpp
                 main.cpp )
 
 target_compile_features( ShareBook_srv PRIVATE cxx_std_20 )
@@ -31,7 +55,7 @@ add_subdirectory(json)
 #链接库
 target_link_libraries(ShareBook_srv
     PRIVATE
-#    mariadbcpp
+    mariadbcpp
     pthread
     nlohmann_json
 )

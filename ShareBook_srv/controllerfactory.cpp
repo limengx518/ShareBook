@@ -33,6 +33,21 @@ ScanAndCheckJottingController *ControllerFactory::createScanAndCheckJottingContr
     return ScanAndCheckJottingController::getInstance();
 }
 
+InitController *ControllerFactory::createInitController()
+{
+    return InitController::getInstance();
+}
+
+CacheFlush *ControllerFactory::createCacheFlush()
+{
+    return CacheFlush::getInstance();
+}
+
+MessageController *ControllerFactory::createMessageController()
+{
+    return MessageController::getInstance();
+}
+
 ControllerFactory::ControllerFactory()
 {
 

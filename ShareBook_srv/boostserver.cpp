@@ -11,6 +11,7 @@ BoostServer::BoostServer()
 {
     m_scanAndCheckJottingController = ControllerFactory::getInstance()->createScanAndCheckJottingController();
     m_publishJottingController = ControllerFactory::getInstance()->createPublishJottingController();
+    m_initController = ControllerFactory::getInstance()->createInitController();
 }
 
 void BoostServer::start()
@@ -22,6 +23,7 @@ void BoostServer::start()
 
     for(;;){
         tcp::socket socket(io_service);
+        //阻塞接收来自客户端的连接
         acceptor.accept(socket);
         m_threadPool.submit(std::bind(&BoostServer::processClientRequest,this,boost::make_shared<tcp::socket>((std::move(socket)))));
     }
@@ -33,17 +35,26 @@ void BoostServer::processClientRequest(socket_ptr s)
     try {
         BoostNetwork boostNetwork(s);
         std::string message=boostNetwork.receiveMessage();
+        std::cout<<"the message is "<<message<<std::endl;
         json j=json::parse(message);
         std::string request = j["request"];
+        std::string netizenId = j["id"];
+
+        //浏览笔记
         if(request == "ScanJottings"){
             std::cout<<"Server << "<<request<<std::endl;
-            json j = m_scanAndCheckJottingController->pushJottings();
-
+            json j = m_scanAndCheckJottingController->pushJottings(netizenId);
             boostNetwork.sendMessage(j.dump());
 
         }else if(request == "PublishJottings"){
             std::string  isPub=m_publishJottingController->publishJottings(j);
             boostNetwork.sendMessage(isPub);
+        }else if(request == "InitPersonalInfo"){
+            std::cout<<"Netizen "<<netizenId<<" : InitPersonalInfo"<<std::endl;
+            json j = m_initController->getInfo(netizenId);
+            std::cout<<j.dump()<<std::endl;
+            boostNetwork.sendMessage(j.dump());
+            std::cout<<"Init final"<<std::endl;
         }
 
     }  catch (...) {
