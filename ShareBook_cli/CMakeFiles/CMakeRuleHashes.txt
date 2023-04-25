@@ -1,3 +1,0 @@
-# Hashes of file build rules.
-f0a8536a2fe3d3cec6ed1bfdc79784e3 CMakeFiles/ShareBook_cli_autogen
-fd08d6ce656f0df855db783d191146e6 ShareBook_cli_en_001.ts

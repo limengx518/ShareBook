@@ -28,9 +28,8 @@ public:
     int connectSocket(const char *ipaddr);
     int closeSocket();
 
-//    std::string receiveMessage();
+    std::string receiveFile();
 
-//    bool sendMessage(char *buf, size_t size);
     bool receiveMessage(char* buffer);
     bool sendMessage(const char *buf, size_t size);
     bool sendFile(char *buf,size_t size,std::string filePath);

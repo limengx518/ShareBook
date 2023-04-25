@@ -8,12 +8,19 @@
 class Client
 {
 public:
-    Client(const char *ipaddr);
+    static Client *getInstance();
+     ~Client();
+
     void send(const char *buf, size_t size);
     void sendFile(char *buf, size_t size, std::string filePath);
     bool receive(char * buf);
-    ~Client();
+    void start();
+    void reconnect();
+    std::string receiveFile();
+    void closeSocket();
 private:
+    Client();
+    static Client* m_instance;
     Network  m_network;
 };
 

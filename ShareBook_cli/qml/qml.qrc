@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>PushPage.qml</file>
+        <file>CyclePage.qml</file>
+        <file>PublishPage.qml</file>
+        <file>MessagePage.qml</file>
+        <file>PersonalPage.qml</file>
+        <file>PersonalRelationList.qml</file>
+        <file>JotDetailPage.qml</file>
+        <file>ChooseMaterialPage.qml</file>
+        <file>MainWindow.qml</file>
+        <file>Toast.qml</file>
+    </qresource>
+</RCC>

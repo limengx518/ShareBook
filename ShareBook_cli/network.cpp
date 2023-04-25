@@ -11,9 +11,9 @@
  *****************************************************************************/
 #include "network.h"
 
-#define SERV_PORT 9877
+#define SERV_PORT 9878
 #define INFTIM -1 //poll永远等待
-#define MAXLINE 1024
+#define MAXLINE 9999999
 #define INVALID_SOCKET_FD -1
 
 using json = nlohmann::json;
@@ -47,28 +47,6 @@ int Network::connectSocket(const char* ipaddr)
     }
     return 0;
 }
-/*
-std::string Network::receiveMessage()
-{
-    char buf[MAXLINE];
-    memset(buf,0,sizeof(buf));
-    int n=recv(m_sockfd,buf,sizeof(buf),0);
-    if( n == -1){
-        if(errno == ECONNRESET || errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
-            printf("Client read error. Errorn info: %d %s\n",errno,strerror(errno));
-        }
-        return nullptr;
-    }else if(n==0){
-        printf("The opposite end has closed the socket.\n");
-        return nullptr;
-    }
-    std::string s(buf);
-    if(s.empty()){
-        std::cerr<<"Network: Client receieve null"<<std::endl;
-        return nullptr;
-    };
-    return s;
-}*/
 
 bool Network::receiveMessage(char* buffer)
 {
@@ -97,27 +75,6 @@ bool Network::receiveMessage(char* buffer)
     }
     return true;
 }
-
-
-
-/*
-bool Network::sendMessage(char *buf, size_t size)
-{
-    if(m_sockfd<0){
-        std::cerr<<"Client Socket error"<<std::endl;
-        return false;
-    }
-    if(buf == NULL || size <= 0) return -1;
-    int n = ::send(m_sockfd,buf,size,0);
-    if(n <0){
-        if(errno == EWOULDBLOCK || errno == EINTR || errno == EWOULDBLOCK){
-            printf("Client write error. Errorn info: %d %s\n",errno,strerror(errno));
-        }
-        return false;
-    }
-
-    return true;
-}*/
 
 bool Network::sendMessage(const char *buf, size_t size)
 {
@@ -185,3 +142,70 @@ int Network::closeSocket()
     }
     return 0;
 }
+
+std::string Network::receiveFile()
+{
+    char buf[MAXLINE];
+    memset(buf,0,sizeof(buf));
+    int n=recv(m_sockfd,buf,sizeof(buf),0);
+    std::cout<<"receive size:"<<n;
+    std::cout<<buf;
+    if( n == -1){
+        if(errno == ECONNRESET || errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
+            printf("Client read error. Errorn info: %d %s\n",errno,strerror(errno));
+        }
+        return nullptr;
+    }else if(n==0){
+        printf("The opposite end has closed the socket.\n");
+        return nullptr;
+    }
+    std::string s(buf);
+    if(s.empty()){
+        std::cerr<<"Network: Client receieve null"<<std::endl;
+        return nullptr;
+    };
+    return s;
+}
+
+/*
+std::string Network::receiveMessage()
+{
+    char buf[MAXLINE];
+    memset(buf,0,sizeof(buf));
+    int n=recv(m_sockfd,buf,sizeof(buf),0);
+    if( n == -1){
+        if(errno == ECONNRESET || errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN){
+            printf("Client read error. Errorn info: %d %s\n",errno,strerror(errno));
+        }
+        return nullptr;
+    }else if(n==0){
+        printf("The opposite end has closed the socket.\n");
+        return nullptr;
+    }
+    std::string s(buf);
+    if(s.empty()){
+        std::cerr<<"Network: Client receieve null"<<std::endl;
+        return nullptr;
+    };
+    return s;
+}*/
+
+
+/*
+bool Network::sendMessage(char *buf, size_t size)
+{
+    if(m_sockfd<0){
+        std::cerr<<"Client Socket error"<<std::endl;
+        return false;
+    }
+    if(buf == NULL || size <= 0) return -1;
+    int n = ::send(m_sockfd,buf,size,0);
+    if(n <0){
+        if(errno == EWOULDBLOCK || errno == EINTR || errno == EWOULDBLOCK){
+            printf("Client write error. Errorn info: %d %s\n",errno,strerror(errno));
+        }
+        return false;
+    }
+
+    return true;
+}*/

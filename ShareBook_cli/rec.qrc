@@ -1,0 +1,44 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/@.png</file>
+        <file>images/app.png</file>
+        <file>images/avatar.png</file>
+        <file>images/backbutton.png</file>
+        <file>images/collect.png</file>
+        <file>images/collect1.png</file>
+        <file>images/collected.png</file>
+        <file>images/commend.png</file>
+        <file>images/comment.png</file>
+        <file>images/firstPic0.png</file>
+        <file>images/groupChat.png</file>
+        <file>images/head.png</file>
+        <file>images/headpic.png</file>
+        <file>images/home.png</file>
+        <file>images/like.png</file>
+        <file>images/liked.png</file>
+        <file>images/message.png</file>
+        <file>images/message_follow.png</file>
+        <file>images/message_like.png</file>
+        <file>images/myotherselect.png</file>
+        <file>images/otherchoice.png</file>
+        <file>images/personal.png</file>
+        <file>images/publish.png</file>
+        <file>images/search.png</file>
+        <file>images/share.png</file>
+        <file>images/system_talk.png</file>
+        <file>images/transit.png</file>
+        <file>images/homeIng.png</file>
+        <file>images/personalIng.png</file>
+        <file>images/messageIng.png</file>
+        <file>images/vedioIng.png</file>
+        <file>images/vedio.png</file>
+        <file>images/save.png</file>
+        <file>images/addPic.png</file>
+        <file>images/tishi.png</file>
+        <file>images/speaker.png</file>
+        <file>images/mute.png</file>
+        <file>images/stop.png</file>
+        <file>images/play.png</file>
+        <file>images/pause.png</file>
+    </qresource>
+</RCC>
