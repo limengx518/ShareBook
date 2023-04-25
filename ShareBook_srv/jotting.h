@@ -20,7 +20,7 @@ public:
     virtual nlohmann::json getDetail() override; //主页的笔记详情
     virtual nlohmann::json getOnePicAbstract() override;
     virtual nlohmann::json getInfoDetail() override; //非主页的笔记详情
-
+    virtual nlohmann::json getMessageAbstract() override;
 
     const std::string note() const;
     const std::string time() const;

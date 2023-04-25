@@ -22,42 +22,35 @@ JottingBroker *JottingBroker::getInstance()
 
 Jotting &JottingBroker::findById(std::string id)
 {
-    try {
-        Jotting* jotting=inCache(id);
+    Jotting* jotting=inCache(id);
 
-        if(jotting == nullptr){
-            return retrieveJotting(id);
-        }
-
-        return *jotting;
-    } catch (...) {
-
+    if(jotting == nullptr){
+        return this->retrieveJotting(id);
     }
+
+    return *jotting;
 }
 
 Jotting &JottingBroker::retrieveJotting(std::string jottingId)
 {
-    try {
-        std::string command="select * from Jotting where J_id="+jottingId;
-        sql::ResultSet* res=RelationalBroker::query(command);
-        std::string id,content,nid,time;
-         // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getUInt(1));
-            content=res->getString(2);
-            time=res->getString(3);
-            nid=std::to_string(res->getUInt(4));
-        }
-        //retrieveJotting(id)
-        Jotting jotting(id,content,time,nid,findMaterials(id),findComments(id));
+    std::string command="select * from Jotting where J_id="+jottingId;
+    sql::ResultSet* res=RelationalBroker::query(command);
+    std::string id,content,nid,time;
+     // Loop through and print results
+    while (res->next()) {
+        id=std::to_string(res->getUInt(1));
+        content=res->getString(2);
+        time=res->getString(3);
+        nid=std::to_string(res->getUInt(4));
+    }
+    //retrieveJotting(id)
+    Jotting jotting(id,content,time,nid,findMaterials(id),findComments(id));
 
-        //将从数据库中拿出的数据放在缓存中(旧的净缓存)
-        m_oldClean.insert({jotting.id(),jotting});
+    //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+    m_oldClean.insert({jotting.id(),jotting});
 
-        return m_oldClean.at(jotting.id());
-        }  catch (...) {
-            std::cout<<"构造jotting对象出错"<<std::endl;
-     }
+    return m_oldClean.at(jotting.id());
+
 //    return nullptr;
 }
 
@@ -138,6 +131,7 @@ void JottingBroker::newCleanFlush()
 {
     for(auto iter = m_newClean.begin(); iter != m_newClean.end();){
 
+        std::cout<<"将笔记内容存入数据库"<<std::endl;
            //保证当进行插入时，数据是不可以被更改的？？？？
            std::unique_lock<std::mutex> lk(m_mutex);
 
@@ -146,7 +140,7 @@ void JottingBroker::newCleanFlush()
            RelationalBroker::insert(command);
 
            //从缓存中删除相关数据
-           std::cout<<"从缓存中删除"<<std::endl;
+           std::cout<<"笔记内容从缓存中删除"<<std::endl;
            //unordered_map这种链表型容器erase后返回的迭代器为当前的位置
            m_newClean.erase(iter++);
            lk.unlock();

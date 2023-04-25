@@ -73,12 +73,13 @@ void MaterialBroker::addMaterial(Material material)
 void MaterialBroker::newCacheFlush()
 {
     for(auto iter = m_newClean.begin(); iter != m_newClean.end();){
-
+        std::cout<<"将图片素材存入数据库"<<std::endl;
         //保证当进行插入时，数据是不可以被更改的？？？？
         std::lock_guard<std::mutex> lk(m_mutex);
 
         //将数据插入数据库
-        std::string command="insert into Material (M_id,M_path,J_id) values("+iter->first+",'"+iter->second.path()+"',"+iter->second.jottingId()+")";
+        std::string command="insert into Material (M_id,M_path,J_id,M_type) values("+iter->first+",'"+iter->second.path()+"',"+iter->second.jottingId()+","+iter->second.type()+")";
+        std::cout<<"command:"<<command<<std::endl;
         RelationalBroker::insert(command);
 
         //从缓存中删除相关数据

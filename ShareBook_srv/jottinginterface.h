@@ -14,6 +14,8 @@ public:
     virtual nlohmann::json getDetail()= 0;//主页的笔记详情
     virtual nlohmann::json getOnePicAbstract() = 0;
     virtual nlohmann::json getInfoDetail() = 0;//非主页的笔记详情
+    virtual nlohmann::json getMessageAbstract() = 0;//消息界面
+
 
     std::string id() const;
 private:

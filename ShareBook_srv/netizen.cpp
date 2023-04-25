@@ -24,7 +24,6 @@ using json = nlohmann::json;
 Netizen::Netizen(const std::string &tid):
     NetizenInterface(tid)
 {
-    _messages.insert("1");
 }
 
 Netizen::Netizen(const std::string id, std::string nickName, std::string signal, std::string avatar, std::vector<std::string> jottingId, std::vector<std::string> fansId, std::vector<std::string> concernedsId, std::vector<std::string> commentdId):
@@ -46,47 +45,58 @@ Netizen::Netizen(const std::string id, std::string nickName, std::string signal,
 
 nlohmann::json Netizen::getInfo()
 {
-//    std::cout<<"getInfo\n";
-    json netizenInfo;
-    netizenInfo["name"]=m_nickName;
-    netizenInfo["signal"]=m_signal;
-    if(strcmp(TEST_TYPE,"PATH")){
-        netizenInfo["avatar"]= encodePhoto(m_avatar);
-    }else{
-         netizenInfo["avatar"] = m_avatar;
+    try {
+        std::cout<<"getInfo\n";
+        json netizenInfo;
+        netizenInfo["name"]=m_nickName;
+        netizenInfo["signal"]=m_signal;
+        std::cout<<"signal\n";
+        if(strcmp(TEST_TYPE,"PATH")){
+            netizenInfo["avatar"]= encodePhoto(m_avatar);
+        }else{
+             netizenInfo["avatar"] = m_avatar;
+        }
+        std::cout<<"avatar\n";
+
+        netizenInfo["fanCnt"] = _fans.size();
+        netizenInfo["interestCnt"] = _concerneds.size();
+        std::cout<<"fanCnt\n";
+        std::cout<<"interestCnt\n";
+
+        json jottingInfo;
+        for(auto &jp:_jottings){
+            json jotting=jp.second.getOnePicAbstract();
+            jotting["id"] = jp.first;
+            netizenInfo["jottings"].push_back(jotting);
+        }
+        std::cout<<"jottingInfo\n";
+
+        netizenInfo["fansInfo"] = getFansInfo();
+    //    if(netizenInfo["fansInfo"].empty()){
+    //        netizenInfo["fansInfo"] = " ";
+    //    }
+        netizenInfo["concernedInfo"] = getConcernedInfo();
+    //    if(netizenInfo["concernedInfo"].empty()){
+    //        netizenInfo["concernedInfo"]= " ";
+    //    }
+    //    netizenInfo["jottings"].push_back(jottingInfo);
+    //    for(auto &fp:_fans){
+    //       json netizenAbstract=fp.second.getAbstract();
+    //       netizenInfo["fans"][fp.first]["nickName"]=netizenAbstract["nickName"];
+    //    }
+    //    for(auto &cp:_concerneds){
+    //       json netizenAbstract=cp.second.getAbstract();
+    //       netizenInfo["concerneds"][cp.first]["nickName"]=netizenAbstract["nickName"];
+    //    }
+
+
+    //    std::cout<<netizenInfo.dump(4)<<std::endl;
+
+        return netizenInfo;
+    }  catch (...) {
+       std::cout<<"getInfo Error"<<std::endl;
+
     }
-
-    netizenInfo["fanCnt"] = _fans.size();
-    netizenInfo["interestCnt"] = _concerneds.size();
-
-    json jottingInfo;
-    for(auto &jp:_jottings){
-        json jotting=jp.second.getOnePicAbstract();
-        netizenInfo["jottings"].push_back(jotting);
-    }
-
-    netizenInfo["fansInfo"] = getFansInfo();
-//    if(netizenInfo["fansInfo"].empty()){
-//        netizenInfo["fansInfo"] = " ";
-//    }
-    netizenInfo["concernedInfo"] = getConcernedInfo();
-//    if(netizenInfo["concernedInfo"].empty()){
-//        netizenInfo["concernedInfo"]= " ";
-//    }
-//    netizenInfo["jottings"].push_back(jottingInfo);
-//    for(auto &fp:_fans){
-//       json netizenAbstract=fp.second.getAbstract();
-//       netizenInfo["fans"][fp.first]["nickName"]=netizenAbstract["nickName"];
-//    }
-//    for(auto &cp:_concerneds){
-//       json netizenAbstract=cp.second.getAbstract();
-//       netizenInfo["concerneds"][cp.first]["nickName"]=netizenAbstract["nickName"];
-//    }
-
-
-//    std::cout<<netizenInfo.dump(4)<<std::endl;
-
-    return netizenInfo;
 }
 
 nlohmann::json Netizen::getFansInfo()
@@ -108,13 +118,42 @@ nlohmann::json Netizen::getConcernedInfo()
 
 }
 
-nlohmann::json Netizen::getJottingNotification()
+std::vector<std::string> Netizen::getJottingNotification()
 {
-    json jottingNotification;
+    std::vector<std::string> jottingId;
     for(auto &item:_messages){
-        jottingNotification["messages"].push_back(item);
+        jottingId.push_back(item);
     }
-    return jottingNotification;
+    return jottingId;
+}
+
+nlohmann::json Netizen::scanVideos()
+{
+    //应该是将视频地址从数据库中拿出来
+    //但是由于ip地址并不固定,不能一直修改数据库,所以暂时先传几个固定的视频地址
+    json message;
+    std::vector<std::string> contents = {
+        "今日份mv推荐",
+        "我可以自己点燃火炬",
+        "舞蹈训练日常"
+    };
+
+    for(int i=1;i<4;i++){
+        json veidos;
+        veidos["name"]=m_nickName;
+        veidos["avatarId"]= m_avatar;
+        if(strcmp(TEST_TYPE,"PATH")){
+            veidos["avatar"]= encodePhoto(m_avatar);
+        }else{
+            veidos["avatar"] = m_avatar;
+        }
+        std::string ip = IPADDR;
+        std::string hls = "http://"+ip+":8081/"+std::to_string(i)+"/playlist.m3u8";
+        veidos["path"] = hls;
+        veidos["content"] = contents[i-1];
+        message.push_back(veidos);
+    }
+    return message;
 }
 
 const string Netizen::avatarPath() const
@@ -281,7 +320,6 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
 
 bool Netizen::publishJotting(nlohmann::json jotting_json)
 {
-
     std::vector<std::string> comments;
     std::vector<Material> materials;
     std::vector<std::string> materialsId;
@@ -291,10 +329,17 @@ bool Netizen::publishJotting(nlohmann::json jotting_json)
     std::string jotting_id=std::to_string((unsigned int)Singleton<IdWorker>::instance().nextId());
 
     //这里还需要根据所创建的文件类型进行再次的修改
-    auto content=jotting_json["content"].get<std::string>();
-    for(auto& material:jotting_json["materials"]){
-        std::string path=material.get<std::string>();
+    std::string content=jotting_json["content"];
+    std::cout<<"发布笔记的内容为"<<content<<std::endl;
+    for(std::string material:jotting_json["materials"]){
+        std::cout<<"所发布笔记的图片大小为:"<<material.size()<<std::endl;
+        std::string materialData=base64_decode(material);
         std::string id=std::to_string((unsigned int)Singleton<IdWorker>::instance().nextId());
+        std::string path = "/root/ShareBook/Picture/"+id+".png";
+        //将二进制流转换为文件存储
+        std::ofstream fout(path, std::ios::binary);
+        fout.write(materialData.c_str(), material.size());
+        fout.close();
         int type=1;
         materialsId.push_back(id);
         materials.push_back(Material(id,jotting_id,path,type));
@@ -315,7 +360,7 @@ bool Netizen::publishJotting(nlohmann::json jotting_json)
 
     //发送给所有粉丝“发布笔记”的消息
     std::string message_content="你关注的人有新的笔记";
-    //创建jotting的id
+    //创建message的id
     unsigned int message_id=Singleton<IdWorker>::instance().nextId();
     //将JottingNotification加入消息队列中
     MessageSequence::getInstance()->pushNotification(JottingNotification(std::to_string(message_id),id(),_fans,message_content,time,jotting.id()));
@@ -323,9 +368,9 @@ bool Netizen::publishJotting(nlohmann::json jotting_json)
     return true;
 }
 
-void Netizen::updateMessage(std::string messageId)
+void Netizen::updateMessage(std::string jottingId)
 {
-    _messages.insert(messageId);
+    _messages.insert(jottingId);
 }
 
 bool Netizen::isOnline()

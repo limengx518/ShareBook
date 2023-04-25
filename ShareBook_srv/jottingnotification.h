@@ -8,15 +8,15 @@
 class JottingNotification
 {
 public:
-    explicit JottingNotification(std::string id,std::string senderId,std::string content,std::string time,std::string jottingId,bool expire);
+//    explicit JottingNotification(std::string id,std::string senderId,std::string content,std::string time,std::string jottingId,bool expire);
     explicit JottingNotification(std::string id,std::string senderId,std::unordered_map<std::string, NetizenProxy> recipients,std::string content,std::string time,std::string jottingId);
 
     //注册订阅者
     void registerSubscriber(const std::string recipientId);
     //删除订阅者
     void removeSubscriber(const std::string recipientId);
-    //通知订阅者
-    void notify();
+    //通知具体的订阅者
+    void notify(std::string netizenId);
 
     bool isReadByAll();
 

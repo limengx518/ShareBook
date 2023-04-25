@@ -30,10 +30,15 @@ nlohmann::json JottingProxy::getDetail()
 
 nlohmann::json JottingProxy::getOnePicAbstract()
 {
-    if(_jotting == nullptr){
-        _jotting = &JottingBroker::getInstance()->findById(id());
+    try {
+        if(_jotting == nullptr){
+            _jotting = &JottingBroker::getInstance()->findById(id());
+        }
+        return _jotting->getOnePicAbstract();
+    }  catch (...) {
+        std::cout<<"get One Pic Abstract error";
     }
-    return _jotting->getOnePicAbstract();
+
 }
 
 nlohmann::json JottingProxy::getInfoDetail()
@@ -42,4 +47,13 @@ nlohmann::json JottingProxy::getInfoDetail()
         _jotting = &JottingBroker::getInstance()->findById(id());
     }
     return _jotting->getInfoDetail();
+}
+
+nlohmann::json JottingProxy::getMessageAbstract()
+{
+    if(_jotting == nullptr){
+        _jotting = &JottingBroker::getInstance()->findById(id());
+    }
+    return _jotting->getMessageAbstract();
+
 }

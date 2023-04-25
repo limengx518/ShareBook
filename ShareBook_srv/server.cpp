@@ -14,7 +14,7 @@
 #include "string.h"
 #include <stdio.h>
 
-#define MAXLINE 999999
+#define MAXLINE 9999999
 
 Server::Server()
 {
@@ -66,7 +66,9 @@ void Server::processClientRequest(int& fd)
     try {
         Network network(fd);
         char buf[MAXLINE];
+
         network.receiveMessage(buf);
+
         json message = json::parse(buf);
         std::cout<<"Server<< 消息长度："<<strlen(buf)<<std::endl;
         if(message.empty()){
@@ -83,13 +85,16 @@ void Server::processClientRequest(int& fd)
             json j = m_scanAndCheckJottingController->pushJottings(netizenId);
             std::string s = j.dump(4);
             std::cout<<s<<std::endl;
-            send(s.data(),s.size(),fd);
+            network.sendMessage(s.data(),s.size());
+//            send(s.data(),s.size(),fd);
             std::cout<<" ----ScanJottings ends----     "<<std::endl;
 
-        }else if(request == "PublishJottings"){
-            std::string  isPub=m_publishJottingController->publishJottings(message);
+        }else if(request == "PublishJotting"){
+            std::cout<<"    ----Netizen "<<netizenId<<" : PublishJotting----    "<<std::endl;
+            std::string  isPub=m_publishJottingController->publishJottings(netizenId,message["jotting"]);
             std::cout<<isPub<<std::endl;
-            send(isPub.data(),isPub.size(),fd);
+            network.sendMessage(isPub.data(),isPub.size());
+//            send(isPub.data(),isPub.size(),fd);
             std::cout<<"Server << 接收笔记信息 发布成功!"<<std::endl;
 
         }else if(request == "InitPersonalInfo"){
@@ -97,26 +102,28 @@ void Server::processClientRequest(int& fd)
             json j = m_initController->getInfo(netizenId);
             std::string s = j.dump(4);
             std::cout<<s<<std::endl;
-            send(s.data(),s.size(),fd);
+//            send(s.data(),s.size(),fd);
+            network.sendMessage(s.data(),s.size());
             std::cout<<"    ----Init final----  "<<std::endl;
         }else if(request == "GetJottingDetail"){
             std::string jottingId = message["jottingId"];
-            std::cout<<"    ----Netizen "<<netizenId<<" : GetJottingDetail----    "<<std::endl;
+            std::cout<<"    ----Netizen "<<netizenId<<" GetJottingDetail "<<jottingId<<"----    "<<std::endl;
             json j = m_scanAndCheckJottingController->pushJottingDetial(netizenId,jottingId);
             std::string s = j.dump(4);
             std::cout<<s<<std::endl;
-            send(s.data(),s.size(),fd);
+//            send(s.data(),s.size(),fd);
+            network.sendMessage(s.data(),s.size());
             std::cout<<"   ---- GetJottingDetail end----    "<<std::endl;
 
         }else if(request == "GetPicture"){
-            std::string picPath = message["picPath"];
-            std::cout<<"    ----Netizen "<<netizenId<<" : GetPicture,Path:"<<picPath<<"----    "<<std::endl;
-//            network.sendFile(picPath);
-            std::string pic = encodePhoto(picPath);
-//            std::cout<<pic<<std::endl;
-            std::cout<<pic.size()<<std::endl;
-            network.sendMessage(pic.data(),pic.size());
-            std::cout<<"Send Picture end"<<std::endl;
+//            std::string picPath = message["picPath"];
+//            std::cout<<"    ----Netizen "<<netizenId<<" : GetPicture,Path:"<<picPath<<"----    "<<std::endl;
+////            network.sendFile(picPath);
+//            std::string pic = encodePhoto(picPath);
+////            std::cout<<pic<<std::endl;
+//            std::cout<<pic.size()<<std::endl;
+//            network.sendMessage(pic.data(),pic.size());
+//            std::cout<<"Send Picture end"<<std::endl;
         }else if(request == "Comment"){
             std::cout<<"    ----Netizen "<<netizenId<<" : Receive Comment---- "<<std::endl;
             std::string  comment = message["text"];
@@ -131,15 +138,24 @@ void Server::processClientRequest(int& fd)
             json j = m_scanAndCheckJottingController->pushInfoJottingDetail(netizenId,jottingId);
             std::string s = j.dump(4);
             std::cout<<s<<std::endl;
-            send(s.data(),s.size(),fd);
+            network.sendMessage(s.data(),s.size());
+//            send(s.data(),s.size(),fd);
             std::cout<<"   ---- GetInfoJottingDetail end----    "<<std::endl;
         }else if(request =="GetMessage"){
             std::cout<<"    ----Netizen "<<netizenId<<" : GetMessage----    "<<std::endl;
             json j = m_messageController->getJottingNotification(netizenId);
             std::string s = j.dump(4);
             std::cout<<s<<std::endl;
-            send(s.data(),s.size(),fd);
+            network.sendMessage(s.data(),s.size());
+//            send(s.data(),s.size(),fd);
             std::cout<<"   ---- GetMessage end----    "<<std::endl;
+        }else if(request == "ScanVideos"){
+            std::cout<<"    ----Netizen "<<netizenId<<" : ScanVideos----    "<<std::endl;
+            json j = m_scanAndCheckJottingController->scanVideos(netizenId);
+            std::string s = j.dump(4);
+            std::cout<<s<<std::endl;
+            network.sendMessage(s.data(),s.size());
+            std::cout<<"   ---- ScanVideos end----    "<<std::endl;
         }
     }  catch (...) {
         std::cout<<"client error"<<std::endl;//确保当其中一个线程异常时不会影响另外的线程

@@ -15,7 +15,7 @@ public:
 
     virtual bool isOnline()=0;
     virtual void setOnline(bool online)=0;
-    virtual void updateMessage(std::string messageId)=0;
+    virtual void updateMessage(std::string jottingId)=0;
 
 private:
     std::string m_id;

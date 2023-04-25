@@ -47,7 +47,7 @@ void BoostServer::processClientRequest(socket_ptr s)
             boostNetwork.sendMessage(j.dump());
 
         }else if(request == "PublishJottings"){
-            std::string  isPub=m_publishJottingController->publishJottings(j);
+            std::string  isPub=m_publishJottingController->publishJottings(j,"1");
             boostNetwork.sendMessage(isPub);
         }else if(request == "InitPersonalInfo"){
             std::cout<<"Netizen "<<netizenId<<" : InitPersonalInfo"<<std::endl;

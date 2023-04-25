@@ -15,6 +15,7 @@ public:
     virtual nlohmann::json getDetail() override;
     virtual nlohmann::json getOnePicAbstract() override;
     virtual nlohmann::json getInfoDetail() override;//非主页的笔记详情
+        virtual nlohmann::json getMessageAbstract();//消息界面
 private:
     Jotting* _jotting;
 };

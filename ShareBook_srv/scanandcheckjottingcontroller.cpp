@@ -79,6 +79,12 @@ json ScanAndCheckJottingController::pushInfoJottingDetail(string netizenId, stri
     return netizen.checkInfoOneJotting(jottingId);
 }
 
+json ScanAndCheckJottingController::scanVideos(string netizenId)
+{
+    Netizen &netizen=NetizenBroker::getInstance()->findById(netizenId);
+    return netizen.scanVideos();
+}
+
 ScanAndCheckJottingController::ScanAndCheckJottingController()
 {
 

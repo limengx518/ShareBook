@@ -28,6 +28,7 @@ nlohmann::json Jotting::getAbstract()
 {
     json j;
     j["id"] = id();
+//    std::cout<<j["id"]<<std::endl;
     j["content"]=m_content;
     j["time"]=m_time;
     for(auto &m:_materials){
@@ -73,6 +74,16 @@ nlohmann::json Jotting::getInfoDetail()
     for(auto &cm:_comments){
         j["comment"].push_back(cm.second.getInfo());
     }
+
+    return j;
+}
+
+nlohmann::json Jotting::getMessageAbstract()
+{
+    json j;
+    j["jottingid"] = id();
+    j["time"]=m_time;
+    j["netizen"]=_netizenProxy.getAbstract();
 
     return j;
 }

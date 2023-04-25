@@ -11,7 +11,7 @@ public:
     static MessageController *getInstance();
     nlohmann::json getJottingNotification(std::string netizenId);
 private:
-    static void NotificationFlush();
+    void NotificationFlush(std::string netizenId);
     MessageController();
     static MessageController* m_instance;
     MyTimer m_myTimer;

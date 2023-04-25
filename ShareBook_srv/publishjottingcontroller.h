@@ -9,7 +9,7 @@ class PublishJottingController : public Controller
 {
 public:
      static PublishJottingController *getInstance();
-     std::string publishJottings(nlohmann::json j);
+     std::string publishJottings(std::string netizenId,nlohmann::json j);
      void comment(std::string netizenId,std::string comment,std::string jottingId);
 private:
      PublishJottingController();

@@ -14,7 +14,7 @@ public:
 
     virtual bool isOnline() override;
     virtual void setOnline(bool online) override;
-    virtual void updateMessage(std::string id) override;
+    virtual void updateMessage(std::string jottingId) override;
 private:
     Netizen *_netizen;
 };

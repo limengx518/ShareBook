@@ -22,7 +22,8 @@ public:
     nlohmann::json getInfo();
     nlohmann::json getFansInfo();
     nlohmann::json getConcernedInfo();
-    nlohmann::json getJottingNotification();
+    std::vector<std::string> getJottingNotification();
+    nlohmann::json scanVideos();
 
     const std::string avatarPath() const;
     const std::string nickName()const;
@@ -42,7 +43,7 @@ public:
     bool comment(const std::string content,const std::string jottingId);
     bool publishJotting(nlohmann::json jotting_json);
 
-    void updateMessage(std::string messageId) override;    //更新消息关联
+    void updateMessage(std::string jottingId) override;    //更新消息关联
     virtual bool isOnline() override;   //判断是否在线
     virtual void setOnline(bool online) override;
 
@@ -61,7 +62,7 @@ private:
     std::unordered_map<std::string, NetizenProxy> _fans;
     std::unordered_map<std::string, NetizenProxy> _concerneds;
     std::unordered_map<std::string, CommentProxy> _comments;
-
+    //存放的内容为通知的笔记的id
     std::set<std::string> _messages;
     bool m_online;
 

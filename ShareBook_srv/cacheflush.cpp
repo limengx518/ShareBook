@@ -22,6 +22,6 @@ void CacheFlush::flush()
 {
 //    NetizenBroker::getInstance()->flush();
 //    JottingBroker::getInstance()->flush();
-    CommentBroker::getInstance()->flush();
+//    CommentBroker::getInstance()->flush();
 //    MaterialBroker::getInstance()->flush();
 }

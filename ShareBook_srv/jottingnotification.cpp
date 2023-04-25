@@ -1,16 +1,16 @@
 #include "jottingnotification.h"
 #include <iostream>
 
-JottingNotification::JottingNotification(std::string id, std::string senderId, std::string content, std::string time, std::string jottingId,bool expire):
-    m_id{id},
-    m_senderId{senderId},
-    m_content{content},
-    m_time{time},
-    m_jottingId{jottingId},
-    m_expire{expire}
-{
+//JottingNotification::JottingNotification(std::string id, std::string senderId, std::string content, std::string time, std::string jottingId,bool expire):
+//    m_id{id},
+//    m_senderId{senderId},
+//    m_content{content},
+//    m_time{time},
+//    m_jottingId{jottingId},
+//    m_expire{expire}
+//{
 
-}
+//}
 
 JottingNotification::JottingNotification(std::string id,std::string senderId,std::unordered_map<std::string, NetizenProxy> recipients, std::string content, std::string time, std::string jottingId):
     m_id{id},
@@ -33,12 +33,16 @@ void JottingNotification::removeSubscriber(const std::string recipientId)
     _recipients.erase(recipientId);
 }
 
-void JottingNotification::notify()
+void JottingNotification::notify(std::string netizenId)
 {
+//    if(_recipients.find(netizenId)!=_recipients.end()){
+//        _recipients[netizenId].updateMessage(m_jottingId);
+//    }
     for(auto& subscriber:_recipients){
-//        if(subscriber.second.isOnline()){
+        if(subscriber.first==netizenId){
+            std::cout<<"与这个网民有关的消息进行更新"<<std::endl;
             subscriber.second.updateMessage(m_jottingId);
-//        }
+        }
     }
 }
 

@@ -35,10 +35,10 @@ void NetizenProxy::setOnline(bool online)
     _netizen->setOnline(online);
 }
 
-void NetizenProxy::updateMessage(std::string messageId)
+void NetizenProxy::updateMessage(std::string jottingId)
 {
     if(_netizen==nullptr){
         _netizen=&NetizenBroker::getInstance()->findById(id());
     }
-    return _netizen->updateMessage(messageId);
+    return _netizen->updateMessage(jottingId);
 }

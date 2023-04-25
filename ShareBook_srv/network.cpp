@@ -13,7 +13,7 @@
 #include "encodephoto.h"
 
 
-#define SERV_PORT 9877
+#define SERV_PORT 9878
 #define LISTENQ 1000
 #define INFTIM -1 //poll永远等待
 #define MAXLINE 1024

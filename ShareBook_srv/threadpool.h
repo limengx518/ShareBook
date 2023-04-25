@@ -18,7 +18,7 @@ public:
 private:
     std::atomic_bool m_done;
     ThreadSafeQueue<std::function<void()>> m_workQueue;
-    std::vector<std::thread> m_threads;
+    std::vector<std::thread*> m_threads;
 //    join_threads m_joiner;
 
     void worker_thread();

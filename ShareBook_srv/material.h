@@ -20,6 +20,7 @@ public:
     const std::string jottingId() const;
     virtual nlohmann::json getAbstract() override;
     const std::string &path() const;
+    const std::string type() const;
 
 private:
     JottingProxy _jottingProxy;

@@ -54,3 +54,8 @@ const std::string &Material::path() const
 {
     return m_path;
 }
+
+const std::string Material::type() const
+{
+    return "1";
+}

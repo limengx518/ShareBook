@@ -19,7 +19,7 @@ public:
     JottingNotification* findById(std::string id);
 
     //更新消息队列
-    void updateMessageQueue();
+    void updateMessageQueue(std::string netizenId);
     //移除指定message的某个订阅者
     void removeMessageSubscriber(std::string messageId,std::string subscriberId);
 

@@ -14,6 +14,7 @@ public:
     json pushJottings(std::string netizenId);
     json pushJottingDetial(std::string netizenId,std::string jottingId);
     json pushInfoJottingDetail(std::string netizenId,std::string jottingId);
+    json scanVideos(std::string netizenId);
 private:
     ScanAndCheckJottingController();
     static ScanAndCheckJottingController* m_instance;
