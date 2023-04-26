@@ -22,7 +22,6 @@ Client::Client()
     m_network.createSocket();
     m_network.connectSocket(ipaddr);
     std::cout<<"Client"<<"客户端建立连接，初始化数据中......"<<std::endl;
-
 }
 
 void Client::send( const char *buf, size_t size)

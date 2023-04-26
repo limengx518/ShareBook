@@ -15,6 +15,8 @@ public:
     void setInterestHashPixmaps(const QHash<QString,QPixmap> &newPixmaps);
     void setFanHashPixmaps(const QHash<QString,QPixmap> &newPixmaps);
     void setpushUIAvatars(const QHash<QString,QPixmap> &newPixmaps);
+
+    void setMessageUIAvatars(const QHash<QString,QPixmap> &newPixmaps);
     void setpushUIPics(const QHash<QString,QPixmap> &newPixmaps);
     void setDetailUIAvatars(const QHash<QString,QPixmap> &newPixmaps);
     void setVideoAvatars(const QHash<QString,QPixmap> &newPixmaps);
@@ -28,6 +30,7 @@ private:
     QHash<QString,QPixmap> m_interestAvatars;
     QHash<QString,QPixmap> m_fanAvatars;
     QHash<QString,QPixmap> m_pushUIAvatars;
+    QHash<QString,QPixmap> m_messageUIAvatars;
     QHash<QString,QPixmap> m_detailUIAvatars;
     QHash<QString,QPixmap> m_pushUIPics;
     QHash<QString,QPixmap> m_videoAvatars;

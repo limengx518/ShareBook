@@ -282,6 +282,7 @@ Item {
                 openFile.publishJotting(edit.text)
 //                publishFinishText.text = "发布成功！"
                 publishFinish.open()
+                publishPage.value=0
                 console.log("发布笔记点击啦！")
                 //进度条开始
                 na.start()

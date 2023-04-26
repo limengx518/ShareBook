@@ -62,13 +62,13 @@ void MessageUIControl::scanMessage()
         std::string content = " 您关注的 " +str + " 发布了新的笔记！";
         oneNotification["content"] = content;
 
-//        oneNotification["jottingId"] = info["jottingId"];
-        oneNotification["jottingId"] = "1";
+        oneNotification["jottingId"] = info["jottingid"];
+//        oneNotification["jottingId"] = "1";
         oneNotification["time"] = info["time"];
 
         receiveNotifications["notification"].push_back(oneNotification);
     }
-    imageProvider->setpushUIAvatars(avatars);
+    imageProvider->setMessageUIAvatars(avatars);
 
     cout<<receiveNotifications.dump(4)<<endl;
 

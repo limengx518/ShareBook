@@ -134,7 +134,7 @@ void Server::processClientRequest(int& fd)
             std::cout<<"   ----Receive end----"<<std::endl;
         }else if(request == "GetInfoJottingDetail"){ //个人主页中的笔记详情
             std::string jottingId = message["jottingId"];
-            std::cout<<"    ----Netizen "<<netizenId<<" : GetInfoJottingDetail----    "<<std::endl;
+            std::cout<<"    ----Netizen "<<netizenId<<" : GetInfoJottingDetail----    "<<jottingId<<std::endl;
             json j = m_scanAndCheckJottingController->pushInfoJottingDetail(netizenId,jottingId);
             std::string s = j.dump(4);
             std::cout<<s<<std::endl;

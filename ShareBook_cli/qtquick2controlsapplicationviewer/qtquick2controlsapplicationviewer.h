@@ -5,6 +5,9 @@
   QML paths are handled here.
   It is recommended not to modify this file, since newer versions of Qt Creator
   may offer an updated version of it.
+
+此文件由Qt Creator的Qt Quick 2应用程序向导生成。Qt Quick2ApplicationViewer是一个方便类。
+QML路径在此处处理。建议不要修改此文件，因为更新版本的Qt Creator可能会提供更新版本。
 */
 #ifndef QTQUICK2APPLICATIONVIEWER_H
 #define QTQUICK2APPLICATIONVIEWER_H

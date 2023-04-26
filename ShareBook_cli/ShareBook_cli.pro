@@ -88,6 +88,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 include(qtquick2controlsapplicationviewer/qtquick2controlsapplicationviewer.pri)
 qtcAddDeployment()
 
+dataFiles.files += /images
+dataFiles.files += /qml/mediaplayer
+dataFiles.path = /assets/data
+
+INSTALLS += dataFiles
+
+
+
+
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android_sources
 
 HEADERS += \

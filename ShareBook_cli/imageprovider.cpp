@@ -31,6 +31,10 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
         return m_pushUIPics[id];
     }else if(m_detailUIAvatars .find(id) != m_detailUIAvatars.end()){
         return m_detailUIAvatars[id];
+    }else if(m_messageUIAvatars .find(id) != m_messageUIAvatars.end()){
+        return m_messageUIAvatars[id];
+    }else if(m_videoAvatars .find(id) != m_videoAvatars.end()){
+        return m_videoAvatars[id];
     }
 
     return QPixmap();
@@ -84,6 +88,11 @@ void ImageProvider::setFanHashPixmaps(const QHash<QString, QPixmap> &newPixmaps)
 void ImageProvider::setpushUIAvatars(const QHash<QString, QPixmap> &newPixmaps)
 {
     m_pushUIAvatars = newPixmaps;
+}
+
+void ImageProvider::setMessageUIAvatars(const QHash<QString, QPixmap> &newPixmaps)
+{
+    m_messageUIAvatars = newPixmaps;
 }
 
 void ImageProvider::setpushUIPics(const QHash<QString, QPixmap> &newPixmaps)
